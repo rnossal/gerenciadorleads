@@ -1,0 +1,16 @@
+{
+  "INCORRECT_USER_PASSWORD": "Usuário ou senha incorretos.",
+  "TOKEN_NOT_FOUND": "Não foi possível encontrar o token de autorização.",
+  "NOT_AUTHENTICATED": "Não autenticado.",
+  "USER_NOT_FOUND": "Usuário não encontrado.",
+  "NO_PERMISSION": "Você não possui permissão para acessar esse recurso.",
+  "USERNAME_EMAIL_EXISTS": "Já existe um usuário com o mesmo email e nome de usuário.",
+  "USERNAME_EXISTS": "Já existe um usuário com o mesmo nome de usuário.",
+  "EMAIL_EXISTS": "Já existe um usuário com o mesmo email.",
+  "INVALID_PASSWORD": "A senha não pode ser menor que 8 caracteres.",
+  "INVALID_NAME": "Você deve informar um nome.",
+  "INVALID_EMAIL": "Você deve informar um e-mail válido.",
+  "INVALID_PHONE": "Você deve informar um telefone válido.",
+  "INVALID_PARAMETERS": "Parâmetros inválidos na requisição.",
+  "LEAD_NOT_FOUND": "Lead não localizado."
+}
