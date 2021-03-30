@@ -15,6 +15,7 @@ router.get('/', authenticate(), graphqlHTTP({
 }));
 
 router.post('/', authenticate(), async (req, res) => {
+  const { user } = req;
   const { models } = req.context;
   const {
     name,
@@ -32,6 +33,7 @@ router.post('/', authenticate(), async (req, res) => {
     email,
     phone,
     observations,
+    createdBy: user.id,
   });
   const leadSaved = await leadModel.save();
 

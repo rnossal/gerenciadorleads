@@ -1,4 +1,5 @@
 import graphQL from 'graphql';
+import { UserType } from './user.js'
 
 const {
   GraphQLObjectType,
@@ -22,6 +23,9 @@ export const LeadType = new GraphQLObjectType({
     },
     observations: {
       type: GraphQLString,
+    },
+    createdBy: {
+      type: UserType,
     },
   }),
 });

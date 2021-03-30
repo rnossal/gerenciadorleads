@@ -5,6 +5,10 @@ export const schema = new mongoose.Schema({
   email: String,
   phone: String,
   observations: String,
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+    ref: 'User',
+  },
 }, {
   timestamps: true,
   versionKey: false,

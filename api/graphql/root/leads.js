@@ -2,7 +2,9 @@ export const LeadsRoot = {
   lead: async (args, req) => {
     const { models } = req.context;
 
-    return models.Lead.findById(args.id);
+    return models.Lead.findById(args.id).populate({
+      path: 'createdBy',
+    });
   },
   leads: async (args, req) => {
     const { models } = req.context;
@@ -25,7 +27,9 @@ export const LeadsRoot = {
       }
     }
 
-    return models.Lead.find(query);
+    return models.Lead.find(query).populate({
+      path: 'createdBy',
+    });
   },
 };
 
