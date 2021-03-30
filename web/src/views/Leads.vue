@@ -28,6 +28,7 @@
           <Col span="20">
             <p><b>Email: </b>{{leadItem.email}}</p>
             <p v-if="leadItem.phone"><b>Telefone: </b>{{leadItem.phone}}</p>
+            <p v-if="leadItem.createdBy"><b>Criador por: </b>{{leadItem.createdBy.name}}</p>
             <p v-if="leadItem.observations"><b>Observações: </b>{{leadItem.observations}}</p>
           </Col>
           <Col class="lead-actions" span="4">
@@ -155,6 +156,9 @@ export default {
                 email
                 phone
                 observations
+                createdBy {
+                  name
+                }
               }
             }`,
           },
