@@ -21,6 +21,7 @@ router.post('/', async (req, res) => {
     username,
     email,
     password,
+    admin,
   } = req.body;
 
   const userExists = await models.User.findOne({ $or: [{ username }, { email }] });
@@ -45,6 +46,7 @@ router.post('/', async (req, res) => {
     username,
     email,
     password: passwordHash,
+    admin,
   });
   const userSaved = await userModel.save();
 
@@ -93,7 +95,7 @@ router.put('/', authenticate(), async (req, res) => {
     updateModel.password = await bcrypt.hash(password, 12);
   }
 
-  const user = models.User.findById(userId);
+  const user = await models.User.findById(userId);
   const userSaved = await user.updateOne(updateModel);
 
   return res.json({
@@ -101,8 +103,21 @@ router.put('/', authenticate(), async (req, res) => {
   });
 });
 
-// router.delete('/', authenticate(), (req, res) => {
+router.delete('/', authenticate(), async (req, res) => {
+  const { models } = req.context;
+  const {
+    userId,
+  } = req.body;
 
-// });
+  const user = await models.User.findById(userId);
+
+  if (!user) return res.status(400).json({ message: req.t('USER_NOT_FOUND') });
+
+  const userDeleted = await user.remove();
+
+  return res.json({
+    user: userDeleted,
+  });
+});
 
 export default router;
