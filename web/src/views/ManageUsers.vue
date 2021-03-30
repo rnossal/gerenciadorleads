@@ -13,6 +13,8 @@
               @on-search="onSearch"
             />
             <Divider id="users-list-divider" />
+            <Button @click="mountCreateUser" type="primary" long>Criar usuário</Button>
+            <Divider id="users-list-divider" />
             <List>
               <ListItem
                 class="user-list-item"
@@ -55,12 +57,21 @@
               </FormItem>
               <FormItem>
                 <Button
-                  type="primary"
+                  class="user-actions"
+                  type="error"
                   :loading="saving"
-                  @click="saveUser"
+                  @click="creatingUser ? cancelCreateUser() : deleteUser()"
                   :disabled="disabled"
                   long
-                >Salvar</Button>
+                >{{creatingUser ? 'Calcelar' : 'Deletar'}}</Button>
+                <Button
+                  class="user-actions"
+                  type="primary"
+                  :loading="saving"
+                  @click="creatingUser ? createUser() : saveUser()"
+                  :disabled="disabled"
+                  long
+                >{{creatingUser ? 'Criar usuário' : 'Salvar'}}</Button>
               </FormItem>
             </i-form>
           </Content>
@@ -77,50 +88,71 @@ import handleError from '@/mixins/handleError';
 export default {
   name: 'ManageUsers',
   mixins: [handleError],
-  data: () => ({
-    searchTerm: null,
-    usersList: [],
-    userInfo: {},
-    formData: {},
-    formRules: {
-      name: [
-        {
-          required: true,
-          message: 'Informe o nome',
-          trigger: 'blur',
-        },
-      ],
-      username: [
-        {
-          required: true,
-          message: 'Informe o usuário',
-          trigger: 'blur',
-        },
-      ],
-      email: [
-        {
-          required: true,
-          message: 'Informe o e-mail',
-          trigger: 'blur',
-        },
-        {
-          type: 'email',
-          message: 'E-mail inválido',
-          trigger: 'blur',
-        },
-      ],
-      password: [
-        {
-          type: 'string',
-          min: 8,
-          message: 'A senha não pode ser menor que 8 caracteres',
-          trigger: 'blur',
-        },
-      ],
-    },
-    saving: false,
-    disabled: true,
-  }),
+  data() {
+    const validatePassword = (_, value, callback) => {
+      if ((!value || value.trim().lenght === 0) && this.creatingUser) {
+        callback(new Error('Você precisa informar a senha'));
+      } else {
+        callback();
+      }
+    };
+
+    return {
+      creatingUser: false,
+      searchTerm: null,
+      usersList: [],
+      userInfo: {},
+      formData: {
+        name: null,
+        username: null,
+        email: null,
+        password: null,
+        admin: false,
+      },
+      formRules: {
+        name: [
+          {
+            required: true,
+            message: 'Informe o nome',
+            trigger: 'blur',
+          },
+        ],
+        username: [
+          {
+            required: true,
+            message: 'Informe o usuário',
+            trigger: 'blur',
+          },
+        ],
+        email: [
+          {
+            required: true,
+            message: 'Informe o e-mail',
+            trigger: 'blur',
+          },
+          {
+            type: 'email',
+            message: 'E-mail inválido',
+            trigger: 'blur',
+          },
+        ],
+        password: [
+          {
+            type: 'string',
+            min: 8,
+            message: 'A senha não pode ser menor que 8 caracteres',
+            trigger: 'blur',
+          },
+          {
+            validator: validatePassword,
+            trigger: 'blur',
+          },
+        ],
+      },
+      saving: false,
+      disabled: true,
+    };
+  },
   methods: {
     async fetch() {
       this.formData = {};
@@ -163,9 +195,26 @@ export default {
         this.handleError('A lista de usuários', 'Sem resposta do servidor');
       }
     },
+    mountCreateUser() {
+      this.disabled = false;
+      this.creatingUser = true;
+      this.formData = {};
+    },
+    cancelCreateUser() {
+      this.disabled = true;
+      this.creatingUser = false;
+      this.formData = {};
+    },
     async loadUser(userId) {
       this.disabled = true;
-      this.formData = {};
+      this.creatingUser = false;
+      this.formData = {
+        name: null,
+        username: null,
+        email: null,
+        password: null,
+        admin: false,
+      };
 
       let graphqlResponse = null;
       try {
@@ -205,6 +254,74 @@ export default {
       } else {
         this.handleError('Falha ao recuperar o usuário', 'Sem resposta do servidor');
       }
+    },
+    async createUser() {
+      if (!(await this.$refs['user-form'].validate())) return;
+
+      this.saving = true;
+
+      let savedUser = null;
+      try {
+        const response = await this.$http.post(users.methods.post, {
+          name: this.formData.name,
+          username: this.formData.username,
+          email: this.formData.email,
+          password: this.formData.password,
+          admin: this.formData.admin,
+        });
+
+        savedUser = response.data;
+      } catch (e) {
+        this.handleError('Falha ao criar o usuário', e);
+      }
+
+      if (savedUser) {
+        this.$Notice.success({
+          desc: 'Usuário criado com sucesso.',
+        });
+
+        await this.fetch();
+      }
+
+      this.saving = false;
+      this.creatingUser = false;
+    },
+    async deleteUser() {
+      if (!(await this.$refs['user-form'].validate())) return;
+
+      if (this.userInfo.id === this.$store.state.user.id) {
+        this.$Notice.error({
+          desc: 'Não é possível deletar o próprio usuário',
+        });
+
+        return;
+      }
+
+      this.saving = true;
+
+      let deletedUser = null;
+      try {
+        const response = await this.$http.delete(users.methods.delete, {
+          data: {
+            userId: this.userInfo.id,
+          },
+        });
+
+        deletedUser = response.data;
+      } catch (e) {
+        this.handleError('Falha ao deletar o usuário', e);
+      }
+
+      if (deletedUser) {
+        this.$Notice.success({
+          desc: 'Usuário deletado com sucesso.',
+        });
+
+        await this.fetch();
+      }
+
+      this.saving = false;
+      this.creatingUser = false;
     },
     async saveUser() {
       if (!(await this.$refs['user-form'].validate())) return;
@@ -258,6 +375,14 @@ export default {
 </script>
 
 <style lang="less">
+.user-actions:first-child {
+  margin-right: 10px;
+}
+
+.user-actions {
+  width: calc(50% - 5px);
+}
+
 #users-sider,
 #user-content {
   background: white;

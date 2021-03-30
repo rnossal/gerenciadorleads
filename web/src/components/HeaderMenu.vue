@@ -24,7 +24,7 @@
               <Icon type="ios-people" />Gerenciar usuários
             </MenuItem>
             <MenuItem name="logout-menu" :to="{ name: 'preferences' }">
-              <Icon type="ios-cog" />Configurações
+              <Icon type="ios-cog" />Configurações do usuário
             </MenuItem>
             <MenuItem name="logout-menu" @click.native="logout">
               <Icon type="ios-exit" />Sair
@@ -94,12 +94,12 @@ export default {
   margin-left: 5px;
 }
 
-#usersub {
-  .ivu-menu-submenu-title {
-    display: flex;
-    align-items: center;
-  }
-}
+// #usersub {
+//   .ivu-menu-submenu-title {
+//     display: flex;
+//     align-items: center;
+//   }
+// }
 
 #user-name {
   max-width: 180px;
