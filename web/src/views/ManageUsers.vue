@@ -1,0 +1,292 @@
+<template>
+  <div class="manage-users">
+    <Content :style="{padding: '20px 50px'}">
+      <h1>Gerenciar usuários</h1>
+      <Card :dis-hover="true">
+        <Layout>
+          <Sider id="users-sider" width="300">
+            <Input
+              search
+              enter-button
+              placeholder="Pesquisar por nome/email/usuário"
+              v-model="searchTerm"
+              @on-search="onSearch"
+            />
+            <Divider id="users-list-divider" />
+            <List>
+              <ListItem
+                class="user-list-item"
+                v-for="userItem in usersList"
+                :key="userItem.id"
+                @click.native="loadUser(userItem.id)"
+              >
+                <div>
+                  <p><b>Nome</b>: {{userItem.name}}</p>
+                  <p><b>Usuário</b>: {{userItem.username}}</p>
+                  <p><b>Email</b>: {{userItem.email}}</p>
+                </div>
+              </ListItem>
+            </List>
+          </Sider>
+          <Content id="user-content">
+            <i-form
+              ref="user-form"
+              :model="formData"
+              :rules="formRules"
+              :disabled="saving || disabled"
+            >
+              <FormItem prop="name" label="Nome">
+                <Input prefix="ios-person" v-model="formData.name" />
+              </FormItem>
+              <FormItem prop="email" label="E-mail">
+                <Input prefix="ios-mail" v-model="formData.email" />
+              </FormItem>
+              <FormItem prop="admin" label="Administrador">
+                <i-switch v-model="formData.admin" />
+              </FormItem>
+              <FormItem prop="username" label="Usuário">
+                <Input prefix="ios-contact" v-model="formData.username" />
+              </FormItem>
+              <FormItem prop="user" label="Usuário" class="fake-user">
+                <Input prefix="ios-contact" value="f3d224f82a774382b95f4a168e20ff52" />
+              </FormItem>
+              <FormItem prop="password" label="Senha (informar somente se quiser alterar)">
+                <Input type="password" prefix="ios-key" v-model="formData.password" password />
+              </FormItem>
+              <FormItem>
+                <Button
+                  type="primary"
+                  :loading="saving"
+                  @click="saveUser"
+                  :disabled="disabled"
+                  long
+                >Salvar</Button>
+              </FormItem>
+            </i-form>
+          </Content>
+        </Layout>
+      </Card>
+    </Content>
+  </div>
+</template>
+
+<script>
+import { users } from '@/assets/config';
+import handleError from '@/mixins/handleError';
+
+export default {
+  name: 'ManageUsers',
+  mixins: [handleError],
+  data: () => ({
+    searchTerm: null,
+    usersList: [],
+    userInfo: {},
+    formData: {},
+    formRules: {
+      name: [
+        {
+          required: true,
+          message: 'Informe o nome',
+          trigger: 'blur',
+        },
+      ],
+      username: [
+        {
+          required: true,
+          message: 'Informe o usuário',
+          trigger: 'blur',
+        },
+      ],
+      email: [
+        {
+          required: true,
+          message: 'Informe o e-mail',
+          trigger: 'blur',
+        },
+        {
+          type: 'email',
+          message: 'E-mail inválido',
+          trigger: 'blur',
+        },
+      ],
+      password: [
+        {
+          type: 'string',
+          min: 8,
+          message: 'A senha não pode ser menor que 8 caracteres',
+          trigger: 'blur',
+        },
+      ],
+    },
+    saving: false,
+    disabled: true,
+  }),
+  methods: {
+    async fetch() {
+      this.formData = {};
+      this.userInfo = {};
+      this.disabled = true;
+
+      let graphqlResponse = null;
+      try {
+        const response = await this.$http.get(users.methods.get, {
+          params: {
+            query: `{
+              users(
+                username: "${this.searchTerm ? this.searchTerm : ''}",
+                name: "${this.searchTerm ? this.searchTerm : ''}",
+                email: "${this.searchTerm ? this.searchTerm : ''}"
+              ) {
+                id
+                name
+                username
+                email
+              }
+            }`,
+          },
+        });
+
+        graphqlResponse = response.data;
+      } catch (e) {
+        this.handleError('A lista de usuários', e);
+
+        return;
+      }
+
+      if (graphqlResponse) {
+        if (graphqlResponse.errors) {
+          this.handleError('A lista de usuários', graphqlResponse);
+        } else {
+          this.usersList = graphqlResponse.data.users;
+        }
+      } else {
+        this.handleError('A lista de usuários', 'Sem resposta do servidor');
+      }
+    },
+    async loadUser(userId) {
+      this.disabled = true;
+      this.formData = {};
+
+      let graphqlResponse = null;
+      try {
+        const response = await this.$http.get(users.methods.get, {
+          params: {
+            query: `{
+              user(id: "${userId}") {
+                id
+                name
+                username
+                email
+                admin
+              }
+            }`,
+          },
+        });
+
+        graphqlResponse = response.data;
+      } catch (e) {
+        this.handleError('Falha ao recuperar o usuário', e);
+
+        return;
+      }
+
+      if (graphqlResponse) {
+        if (graphqlResponse.errors) {
+          this.handleError('Falha ao recuperar o usuário', graphqlResponse);
+        } else {
+          this.userInfo = graphqlResponse.data.user;
+
+          this.formData = Object.assign(this.formData, this.userInfo);
+          delete this.formData.id;
+          this.formData.password = null;
+
+          this.disabled = false;
+        }
+      } else {
+        this.handleError('Falha ao recuperar o usuário', 'Sem resposta do servidor');
+      }
+    },
+    async saveUser() {
+      if (!(await this.$refs['user-form'].validate())) return;
+
+      this.saving = true;
+
+      let savedUser = null;
+      try {
+        const response = await this.$http.put(users.methods.update, {
+          userId: this.userInfo.id,
+          name: this.formData.name,
+          username: this.formData.username,
+          email: this.formData.email,
+          password: this.formData.password,
+          admin: this.formData.admin,
+        });
+
+        savedUser = response.data;
+      } catch (e) {
+        this.handleError('Falha ao salvar', e);
+      }
+
+      if (savedUser) {
+        this.$Notice.success({
+          desc: 'Usuário salvo com sucesso.',
+        });
+
+        await this.fetch();
+      }
+
+      this.saving = false;
+    },
+    async onSearch() {
+      await this.fetch();
+    },
+  },
+  beforeMount() {
+    if (!this.$store.state.user.admin) {
+      this.$router.replace({ name: 'leads' });
+
+      return;
+    }
+
+    this.$Spin.show();
+  },
+  async mounted() {
+    await this.fetch();
+    this.$Spin.hide();
+  },
+};
+</script>
+
+<style lang="less">
+#users-sider,
+#user-content {
+  background: white;
+  padding: 5px;
+}
+
+#users-sider {
+  border-color: #e8eaec;
+  border-style: solid;
+  border-width: 1px 0 1px 1px;
+  border-radius: 3px 0px 0px 3px;
+}
+
+#user-content {
+  border: 1px solid #e8eaec;
+  border-radius: 0px 3px 3px 0px;
+}
+
+#users-list-divider {
+  margin: 5px 0;
+}
+
+.user-list-item:hover {
+  background: #f7f7f7;
+}
+
+.fake-user {
+  margin-bottom: 0;
+  height: 0;
+  overflow: hidden;
+}
+</style>

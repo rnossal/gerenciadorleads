@@ -20,12 +20,12 @@
                 {{$store.state.user ? $store.state.user.name : 'Não autenticado'}}
               </span>
             </template>
-            <!-- <MenuItem v-if="isAdmin" name="logout-menu" :to="{ name: 'manage-users' }">
+            <MenuItem v-if="isAdmin" name="logout-menu" :to="{ name: 'manage-users' }">
               <Icon type="ios-people" />Gerenciar usuários
             </MenuItem>
             <MenuItem name="logout-menu" :to="{ name: 'preferences' }">
               <Icon type="ios-cog" />Configurações
-            </MenuItem> -->
+            </MenuItem>
             <MenuItem name="logout-menu" @click.native="logout">
               <Icon type="ios-exit" />Sair
             </MenuItem>

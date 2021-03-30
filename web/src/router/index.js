@@ -20,6 +20,18 @@ const routes = [
     component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue'),
   },
   {
+    path: '/manage-users',
+    name: 'manage-users',
+    meta: { title: 'Gerenciar usuários' },
+    component: () => import(/* webpackChunkName: "manageUsers" */ '@/views/ManageUsers.vue'),
+  },
+  {
+    path: '/preferences',
+    name: 'preferences',
+    meta: { title: 'Configurações de usuário' },
+    component: () => import(/* webpackChunkName: "preferences" */ '@/views/UserPreferences.vue'),
+  },
+  {
     path: '*',
     name: 'not-found',
     meta: { title: 'Página não encontrada' },

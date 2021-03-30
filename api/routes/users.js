@@ -62,6 +62,7 @@ router.put('/', authenticate(), async (req, res) => {
     email,
     password,
     admin,
+    prefs,
   } = req.body;
 
   const existsEmail = await models.User.findOne({ email });
@@ -82,8 +83,11 @@ router.put('/', authenticate(), async (req, res) => {
     name,
     username,
     email,
-    admin,
   };
+
+  if (!prefs) {
+    updateModel.admin = admin;
+  }
 
   if (password) {
     updateModel.password = await bcrypt.hash(password, 12);

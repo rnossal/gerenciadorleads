@@ -13,6 +13,7 @@ connect().then(async () => {
     username: 'admin',
     email: 'admin@admin.com',
     password: passwordHash,
+    admin: true,
   });
 
   const userSaved = await userModel.save();
