@@ -37,14 +37,19 @@
 </template>
 
 <script>
-import logout from '@/mixins/logout';
-
 export default {
   name: 'HeaderMenu',
-  mixins: [logout],
   computed: {
     isAdmin() {
       return this.$store.state.user.admin;
+    },
+  },
+  methods: {
+    logout() {
+      localStorage.removeItem('auth');
+      this.$store.commit('setUser', null);
+
+      this.$router.replace({ name: 'login' });
     },
   },
 };

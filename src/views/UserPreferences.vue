@@ -34,12 +34,8 @@
 </template>
 
 <script>
-import { authentication, users } from '@/assets/config';
-import handleError from '@/mixins/handleError';
-
 export default {
   name: 'UserPreferences',
-  mixins: [handleError],
   data: () => ({
     userInfo: {},
     formData: {
@@ -87,88 +83,26 @@ export default {
     saving: false,
   }),
   methods: {
-    async fetch() {
-      let graphqlResponse = null;
+    fetch() {
+      this.userInfo = {
+        id: '60514cb64084b319b1c512cd',
+        name: 'Admin',
+        username: 'admin',
+        email: 'admin@admin.com',
+      };
 
-      try {
-        const response = await this.$http.get(users.methods.get, {
-          params: {
-            query: `{
-              user(id: "${this.$store.state.user.id}") {
-                id
-                name
-                username
-                email
-              }
-            }`,
-          },
-        });
-
-        graphqlResponse = response.data;
-      } catch (e) {
-        this.handleError('Falha ao recuperar o usuário', e);
-
-        return;
-      }
-
-      if (graphqlResponse) {
-        if (graphqlResponse.errors) {
-          this.handleError('Falha ao recuperar o usuário', graphqlResponse);
-        } else {
-          this.userInfo = graphqlResponse.data.user;
-
-          this.formData = Object.assign(this.formData, this.userInfo);
-          delete this.formData.id;
-          this.formData.password = null;
-        }
-      } else {
-        this.handleError('Falha ao recuperar o usuário', 'Sem resposta do servidor');
-      }
+      this.formData = Object.assign(this.formData, this.userInfo);
+      delete this.formData.id;
+      this.formData.password = null;
     },
-    async savePreferences() {
-      if (!(await this.$refs['preferences-form'].validate())) return;
-
-      this.saving = true;
-
-      let savedUser = null;
-      try {
-        const response = await this.$http.put(users.methods.update, {
-          userId: this.$store.state.user.id,
-          name: this.formData.name,
-          username: this.formData.username,
-          email: this.formData.email,
-          password: this.formData.password,
-          prefs: true,
-        });
-
-        savedUser = response.data;
-      } catch (e) {
-        this.handleError('Falha ao salvar', e);
-      }
-
-      if (savedUser) {
-        this.$Notice.success({
-          desc: 'Preferências salvas com sucesso.',
-        });
-      }
-
-      try {
-        const response = await this.$http.get(authentication.methods.get);
-
-        this.$store.commit('setUser', response.data.user);
-      } catch (e) {
-        this.handleError('Falha ao recuperar o usuário alterado', e);
-      }
-
-      this.saving = false;
+    savePreferences() {
+      this.$Notice.success({
+        desc: 'Preferências salvas com sucesso.',
+      });
     },
   },
   beforeMount() {
-    this.$Spin.show();
-  },
-  async mounted() {
-    await this.fetch();
-    this.$Spin.hide();
+    this.fetch();
   },
 };
 </script>

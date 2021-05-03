@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import store from '@/store';
-import { authentication } from '@/assets/config';
 import Leads from '@/views/Leads.vue';
 
 Vue.use(VueRouter);
@@ -52,24 +51,16 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (!store.state.user) {
-    try {
-      const response = await router.app.$http.get(authentication.methods.get);
-
-      store.commit('setUser', response.data.user);
-    } catch (e) {
-      if (e?.response?.status === 401) {
-        // eslint-disable-next-line no-console
-        try { await this.$http.delete(authentication.methods.logout); } catch { console.clear(); }
-
-        localStorage.removeItem('auth');
-
-        return router.replace({ name: 'login' });
-      }
-
-      router.app.$Modal.error({ title: 'Erro ao recuperar o usuário', content: e, okText: 'Ok' });
-
-      return next(false);
-    }
+    store.commit('setUser', {
+      name: 'Admin',
+      username: 'admin',
+      email: 'admin@admin.com',
+      password: '$2b$12$J8O3MGLZ05uF0/F.Ti9JQO.5acMP8/iUlZk9tkB0tO/zFl5uiZ.qa',
+      createdAt: '2021-03-17T00:26:30.728Z',
+      updatedAt: '2021-03-31T00:09:46.804Z',
+      admin: true,
+      id: '60514cb64084b319b1c512cd',
+    });
   }
 
   if (to.name === 'login') {

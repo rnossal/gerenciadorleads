@@ -88,12 +88,8 @@
 </template>
 
 <script>
-import handleError from '@/mixins/handleError';
-import { leads } from '@/assets/config';
-
 export default {
   name: 'Leads',
-  mixins: [handleError],
   data: () => ({
     leads: {},
     searchTerm: null,
@@ -107,106 +103,35 @@ export default {
         phone: null,
         observations: null,
       },
-      formRules: {
-        name: [
-          {
-            required: true,
-            message: 'Informe o nome',
-            trigger: 'blur',
-          },
-        ],
-        email: [
-          {
-            required: true,
-            message: 'Informe o email',
-            trigger: 'blur',
-          },
-          {
-            type: 'email',
-            message: 'Email em formato incorreto',
-            trigger: 'blur',
-          },
-        ],
-        phone: [
-          {
-            required: true,
-            message: 'Informe o número de telefone',
-            trigger: 'blur',
-          },
-        ],
-      },
+      formRules: { },
     },
   }),
   methods: {
-    async fetch() {
-      let graphqlResponse = null;
-
-      try {
-        const response = await this.$http.get(leads.methods.get, {
-          params: {
-            query: `{
-              leads(
-                name: "${this.searchTerm ? this.searchTerm : ''}",
-                email: "${this.searchTerm ? this.searchTerm : ''}",
-                phone: "${this.searchTerm ? this.searchTerm : ''}",
-                observations: "${this.searchTerm ? this.searchTerm : ''}"
-              ) {
-                id
-                name
-                email
-                phone
-                observations
-                createdBy {
-                  name
-                }
-              }
-            }`,
+    fetch() {
+      this.leads = [
+        {
+          id: '6063b2724837641c09edfb56',
+          name: 'Rafael Nossal',
+          email: 'rafael.nossal@gmail.com',
+          phone: '51980247533',
+          observations: 'Obs',
+          createdBy: {
+            name: 'Admin',
           },
-        });
-
-        graphqlResponse = response.data;
-      } catch (e) {
-        this.handleError('Falha ao listar os leads', e);
-
-        return;
-      }
-
-      if (graphqlResponse) {
-        if (graphqlResponse.errors) {
-          this.handleError('Falha ao listar os leads', graphqlResponse);
-        } else {
-          this.leads = graphqlResponse.data.leads;
-        }
-      } else {
-        this.handleError('Falha ao listar os leads', 'Sem resposta do servidor');
-      }
+        },
+        {
+          id: '608f3c0823301b0b0ccc029c',
+          name: 'Teste',
+          email: 'teste@teste.com',
+          phone: '11111111111',
+          observations: null,
+          createdBy: {
+            name: 'Admin',
+          },
+        },
+      ];
     },
-    async createLead() {
-      if (!await this.$refs['create-lead-form'].validate()) return;
-
-      this.creatingLead = true;
-
-      try {
-        await this.$http.post(
-          leads.methods.post,
-          {
-            name: this.createLeadModel.formData.name,
-            email: this.createLeadModel.formData.email,
-            phone: this.createLeadModel.formData.phone,
-            observations: this.createLeadModel.formData.observations,
-          },
-        );
-      } catch (e) {
-        this.handleError('Falha ao criar o lead', e);
-
-        this.creatingLead = false;
-
-        return;
-      }
-
-      this.fetch();
-
-      this.creatingLead = false;
+    createLead() {
       this.showCreateLead = false;
     },
     mountUpdateLead(lead) {
@@ -218,59 +143,18 @@ export default {
 
       this.showCreateLead = true;
     },
-    async updateLead() {
-      if (!await this.$refs['create-lead-form'].validate()) return;
-
-      this.creatingLead = true;
-
-      try {
-        await this.$http.put(
-          leads.methods.update,
-          {
-            leadId: this.createLeadModel.formData.leadId,
-            name: this.createLeadModel.formData.name,
-            email: this.createLeadModel.formData.email,
-            phone: this.createLeadModel.formData.phone,
-            observations: this.createLeadModel.formData.observations,
-          },
-        );
-      } catch (e) {
-        this.handleError('Falha ao atualizar o lead', e);
-
-        this.creatingLead = false;
-
-        return;
-      }
-
-      this.fetch();
-
-      this.creatingLead = false;
+    updateLead() {
       this.showCreateLead = false;
     },
-    async deleteLead(lead) {
+    deleteLead(lead) {
       this.$Modal.confirm({
         title: 'Confirmação de deleção?',
         content: `Você tem certeza que deseja deletar o lead ${lead.name}?`,
         onOk: async () => {
-          try {
-            const body = {
-              leadId: lead.id,
-            };
-            const response = await this.$http.delete(leads.methods.delete, { data: body });
-
-            if (response.data.deleted) {
-              this.fetch();
-
-              this.$Notice.success({
-                title: 'Sucesso',
-                desc: 'Lead excluído com sucesso',
-              });
-            } else {
-              this.handleError('Falha ao excluir a turma.');
-            }
-          } catch (e) {
-            this.handleError('Falha ao excluir a turma.', e);
-          }
+          this.$Notice.success({
+            title: 'Sucesso',
+            desc: 'Lead excluído com sucesso',
+          });
         },
         okText: 'Excluir',
       });
@@ -286,11 +170,7 @@ export default {
     },
   },
   beforeMount() {
-    this.$Spin.show();
-  },
-  async mounted() {
-    await this.fetch();
-    this.$Spin.hide();
+    this.fetch();
   },
 };
 </script>
