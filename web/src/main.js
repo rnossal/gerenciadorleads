@@ -6,6 +6,7 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import './assets/less/index.less';
+import flattenObject from './plugins/vue-flattenObject';
 import vueAxios from './plugins/vue-axios';
 import vueMoment from './plugins/vue-moment';
 
@@ -14,6 +15,7 @@ Vue.config.productionTip = false;
 Vue.use(ViewUI, {
   locale,
 });
+Vue.use(flattenObject);
 Vue.use(vueAxios);
 Vue.use(vueMoment);
 
