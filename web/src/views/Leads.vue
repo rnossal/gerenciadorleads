@@ -1,7 +1,7 @@
 <template>
   <div class="leads">
     <Content :style="{padding: '20px 50px'}">
-      <h1>Listagem de Leads</h1>
+      <h1>Lista de Leads</h1>
       <Divider />
       <Card class="leads-actions" :dis-hover="true">
         <Button
@@ -19,9 +19,56 @@
       </Card>
       <Divider />
       <Card
+        v-if="reportView"
+        dis-hover
+      >
+        <div id="table-actions">
+          <Button
+            id="export-table-btn"
+            type="success"
+            @click="exportTable"
+          >
+            Exportar dados
+            <Icon type="ios-grid"></Icon>
+          </Button>
+        </div>
+        <Table
+          ref="leadsTable"
+          :columns="leadsColumns"
+          :data="leads"
+          stripe
+          border
+        >
+          <template slot-scope="{ row }" slot="actions">
+            <Row
+              type="flex"
+              justify="center"
+              :gutter="5"
+            >
+              <i-col>
+                <Button
+                  type="primary"
+                  @click="mountUpdateLead(row)"
+                  :style="{ width: '75px' }"
+                >Editar</Button>
+              </i-col>
+              <i-col>
+                <Button
+                  type="error"
+                  @click="deleteLead(row)"
+                  :style="{ width: '75px' }"
+                >Excluir</Button>
+              </i-col>
+            </Row>
+          </template>
+        </Table>
+      </Card>
+      <Card
+        v-else
         class="lead-card"
         v-for="leadItem in leads"
         :key="leadItem.id"
+        dis-hover
       >
         <p slot="title">{{leadItem.name}}</p>
         <Row>
@@ -88,10 +135,71 @@
 </template>
 
 <script>
+import LeadTableInfo from '@/components/Leads/LeadTableInfo.vue';
+
 export default {
   name: 'Leads',
   data: () => ({
-    leads: {},
+    reportView: true,
+    leadsColumns: [
+      {
+        type: 'expand',
+        width: 40,
+        render: (h, params) => h(LeadTableInfo, {
+          props: {
+            row: params.row,
+          },
+        }),
+      },
+      {
+        title: 'Nome',
+        key: 'name',
+        ellipsis: true,
+      },
+      {
+        title: 'E-mail',
+        key: 'email',
+        ellipsis: true,
+      },
+      {
+        title: 'Telefone',
+        key: 'phone',
+        ellipsis: true,
+      },
+      {
+        title: 'Observações',
+        key: 'observations',
+        ellipsis: true,
+      },
+      {
+        title: 'Ações',
+        slot: 'actions',
+        align: 'center',
+      },
+    ],
+    leadsExportColumns: [
+      {
+        title: 'Nome',
+        key: 'name',
+      },
+      {
+        title: 'E-mail',
+        key: 'email',
+      },
+      {
+        title: 'Telefone',
+        key: 'phone',
+      },
+      {
+        title: 'Observações',
+        key: 'observations',
+      },
+      {
+        title: 'Criado por',
+        key: 'createdBy.name',
+      },
+    ],
+    leads: [],
     searchTerm: null,
     showCreateLead: false,
     creatingLead: false,
@@ -168,6 +276,15 @@ export default {
         this.createLeadModel.formData.observations = null;
       }
     },
+    exportTable() {
+      const leadsData = this.leads.map((l) => this.$flattenObject(l));
+
+      this.$refs.leadsTable.exportCsv({
+        filename: 'leads',
+        columns: this.leadsExportColumns,
+        data: leadsData,
+      });
+    },
   },
   beforeMount() {
     this.fetch();
@@ -196,5 +313,14 @@ export default {
 
 .lead-action {
   margin-bottom: 5px !important;
+}
+
+#table-actions {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+#export-table-btn {
+  margin-left: auto;
 }
 </style>
