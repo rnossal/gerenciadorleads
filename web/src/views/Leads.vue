@@ -122,6 +122,15 @@
           <FormItem prop="phone" label="Telefone">
             <Input v-model="createLeadModel.formData.phone" />
           </FormItem>
+          <FormItem prop="coursesOfInterest" label="Cursos de interesse">
+            <Select v-model="createLeadModel.formData.coursesOfInterest" multiple>
+              <Option
+                v-for="course in courses"
+                :value="course.id"
+                :key="course.id"
+              >{{ course.name }}</Option>
+            </Select>
+          </FormItem>
           <FormItem prop="observations" label="Observações">
             <Input type="textarea" v-model="createLeadModel.formData.observations" />
           </FormItem>
@@ -218,6 +227,7 @@ export default {
         name: null,
         email: null,
         phone: null,
+        coursesOfInterest: [],
         observations: null,
       },
       formRules: {
@@ -268,6 +278,10 @@ export default {
                 name
                 email
                 phone
+                coursesOfInterest {
+                  id
+                  name
+                }
                 observations
                 createdBy {
                   name
@@ -339,6 +353,7 @@ export default {
             email: this.createLeadModel.formData.email,
             phone: this.createLeadModel.formData.phone,
             observations: this.createLeadModel.formData.observations,
+            coursesOfInterest: this.createLeadModel.formData.coursesOfInterest,
           },
         );
       } catch (e) {
@@ -359,6 +374,10 @@ export default {
       this.createLeadModel.formData.name = lead.name;
       this.createLeadModel.formData.email = lead.email;
       this.createLeadModel.formData.phone = lead.phone;
+      this.createLeadModel.formData.coursesOfInterest = [];
+      if (lead.coursesOfInterest) {
+        this.createLeadModel.formData.coursesOfInterest = lead.coursesOfInterest.map((c) => c.id);
+      }
       this.createLeadModel.formData.observations = lead.observations;
 
       this.showCreateLead = true;
@@ -376,6 +395,7 @@ export default {
             name: this.createLeadModel.formData.name,
             email: this.createLeadModel.formData.email,
             phone: this.createLeadModel.formData.phone,
+            coursesOfInterest: this.createLeadModel.formData.coursesOfInterest,
             observations: this.createLeadModel.formData.observations,
           },
         );
@@ -426,6 +446,7 @@ export default {
         this.createLeadModel.formData.name = null;
         this.createLeadModel.formData.email = null;
         this.createLeadModel.formData.phone = null;
+        this.createLeadModel.formData.coursesOfInterest = [];
         this.createLeadModel.formData.observations = null;
       }
     },

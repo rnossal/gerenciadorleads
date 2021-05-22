@@ -5,9 +5,14 @@ export const LeadsRoot = {
     const { models } = req.context;
 
     if (mongoose.Types.ObjectId.isValid(args.id)) {
-      return models.Lead.findById(args.id).populate({
-        path: 'createdBy',
-      });
+      return models.Lead.findById(args.id).populate([
+        {
+          path: 'createdBy',
+        },
+        {
+          path: 'coursesOfInterest',
+        }
+      ]);
     }
 
     return [];
@@ -33,9 +38,14 @@ export const LeadsRoot = {
       }
     }
 
-    return models.Lead.find(query).populate({
-      path: 'createdBy',
-    });
+    return models.Lead.find(query).populate([
+      {
+        path: 'createdBy',
+      },
+      {
+        path: 'coursesOfInterest',
+      }
+    ]);
   },
 };
 

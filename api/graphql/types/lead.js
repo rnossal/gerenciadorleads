@@ -1,9 +1,11 @@
 import graphQL from 'graphql';
+import { CourseType } from './course.js'
 import { UserType } from './user.js'
 
 const {
   GraphQLObjectType,
   GraphQLString,
+  GraphQLList,
 } = graphQL;
 
 export const LeadType = new GraphQLObjectType({
@@ -20,6 +22,9 @@ export const LeadType = new GraphQLObjectType({
     },
     phone: {
       type: GraphQLString,
+    },
+    coursesOfInterest: {
+      type: new GraphQLList(CourseType),
     },
     observations: {
       type: GraphQLString,

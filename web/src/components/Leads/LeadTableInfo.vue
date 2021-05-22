@@ -10,6 +10,9 @@
       <ListItem>
         <ListItemMeta title="Telefone" :description="row.phone" />
       </ListItem>
+      <ListItem v-if="coursesOfInterest">
+        <ListItemMeta title="Cursos de interesse" :description="coursesOfInterest" />
+      </ListItem>
       <ListItem>
         <ListItemMeta title="Criado por" :description="row.createdBy.name" />
       </ListItem>
@@ -25,6 +28,27 @@ export default {
   name: 'LeadTableInfo',
   props: {
     row: Object,
+  },
+  computed: {
+    coursesOfInterest() {
+      let coursesOfInterest = '';
+
+      if (this.row.coursesOfInterest) {
+        this.row.coursesOfInterest.forEach((course, index) => {
+          const deviceName = course.name;
+
+          if ((this.row.coursesOfInterest.length - 2) > index) {
+            coursesOfInterest += `${deviceName}, `;
+          } else if ((this.row.coursesOfInterest.length - 1) > index) {
+            coursesOfInterest += `${deviceName} e `;
+          } else {
+            coursesOfInterest += deviceName;
+          }
+        });
+      }
+
+      return coursesOfInterest;
+    },
   },
 };
 </script>

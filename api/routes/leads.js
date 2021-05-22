@@ -21,6 +21,7 @@ router.post('/', authenticate(), async (req, res) => {
     name,
     email,
     phone,
+    coursesOfInterest,
     observations,
   } = req.body;
 
@@ -32,6 +33,7 @@ router.post('/', authenticate(), async (req, res) => {
     name,
     email,
     phone,
+    coursesOfInterest,
     observations,
     createdBy: user.id,
   });
@@ -49,6 +51,7 @@ router.put('/', authenticate(), async (req, res) => {
     name,
     email,
     phone,
+    coursesOfInterest,
     observations,
   } = req.body;
 
@@ -74,6 +77,9 @@ router.put('/', authenticate(), async (req, res) => {
     if (!phone || phone.trim() === 0) return res.status(400).json({ message: req.t('INVALID_PHONE') });
 
     updateModel.phone = phone;
+  }
+  if (coursesOfInterest !== undefined) {
+    updateModel.coursesOfInterest = coursesOfInterest;
   }
   if (observations !== undefined) updateModel.observations = observations;
 

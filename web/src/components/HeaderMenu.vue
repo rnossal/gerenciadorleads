@@ -52,7 +52,7 @@ export default {
 
 <style lang="less">
 .header-menu {
-  z-index: 9999;
+  z-index: 99;
   position: sticky !important;
   top: 0;
 }
