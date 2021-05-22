@@ -5,6 +5,12 @@ export const schema = new mongoose.Schema({
   email: String,
   phone: String,
   observations: String,
+  coursesOfInterest: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: 'Course',
+    },
+  ],
   createdBy: {
     type: mongoose.Types.ObjectId,
     ref: 'User',
