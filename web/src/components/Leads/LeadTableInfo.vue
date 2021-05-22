@@ -13,7 +13,7 @@
       <ListItem v-if="coursesOfInterest">
         <ListItemMeta title="Cursos de interesse" :description="coursesOfInterest" />
       </ListItem>
-      <ListItem>
+      <ListItem v-if="row.observations">
         <ListItemMeta title="Observações" :description="row.observations" />
       </ListItem>
       <ListItem>

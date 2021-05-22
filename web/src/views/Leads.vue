@@ -120,7 +120,10 @@
             <Input type="email" v-model="createLeadModel.formData.email" />
           </FormItem>
           <FormItem prop="phone" label="Telefone">
-            <Input v-model="createLeadModel.formData.phone" />
+            <CInput
+              v-model="createLeadModel.formData.phone"
+              :mask="['(##) ####-####', '(##) #####-####']"
+            />
           </FormItem>
           <FormItem prop="coursesOfInterest" label="Cursos de interesse">
             <Select v-model="createLeadModel.formData.coursesOfInterest" multiple>
@@ -149,6 +152,7 @@
 </template>
 
 <script>
+import CInput from '@/components/CInput.vue';
 import LeadTableInfo from '@/components/Leads/LeadTableInfo.vue';
 import handleError from '@/mixins/handleError';
 import arrayObjectAttributeToText from '@/mixins/arrayObjectAttributeToText';
@@ -157,6 +161,9 @@ import { leads, courses } from '@/assets/config';
 export default {
   name: 'Leads',
   mixins: [handleError, arrayObjectAttributeToText],
+  components: {
+    CInput,
+  },
   data: () => ({
     reportView: true,
     leadsColumns: [
