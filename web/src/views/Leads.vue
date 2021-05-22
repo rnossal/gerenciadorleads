@@ -97,7 +97,7 @@
           </Row>
         </Card>
       </div>
-      <h1 id="no-leads" v-if="!leads || leads.length === 0">Não existem leads cadastrados.</h1>
+      <h1 id="no-leads" v-else>Não existem leads cadastrados.</h1>
     </Content>
     <Modal
       v-model="showCreateLead"
