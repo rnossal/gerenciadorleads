@@ -151,11 +151,12 @@
 <script>
 import LeadTableInfo from '@/components/Leads/LeadTableInfo.vue';
 import handleError from '@/mixins/handleError';
+import arrayObjectAttributeToText from '@/mixins/arrayObjectAttributeToText';
 import { leads, courses } from '@/assets/config';
 
 export default {
   name: 'Leads',
-  mixins: [handleError],
+  mixins: [handleError, arrayObjectAttributeToText],
   data: () => ({
     reportView: true,
     leadsColumns: [
@@ -208,12 +209,16 @@ export default {
         key: 'phone',
       },
       {
+        title: 'Cursos de interesse',
+        key: 'coursesOfInterest',
+      },
+      {
         title: 'Observações',
         key: 'observations',
       },
       {
         title: 'Criado por',
-        key: 'createdBy.name',
+        key: 'createdBy',
       },
     ],
     leads: [],
@@ -451,12 +456,20 @@ export default {
       }
     },
     exportTable() {
-      const leadsData = this.leads.map((l) => this.$flattenObject(l));
+      const leadsData = this.leads.map((l) => ({
+        name: l.name,
+        email: l.email,
+        phone: l.phone,
+        coursesOfInterest: this.arrayObjectAttributeToText(l.coursesOfInterest, 'name'),
+        observations: l.observations ?? '',
+        createdBy: l.createdBy.name,
+      }));
 
       this.$refs.leadsTable.exportCsv({
         filename: 'leads',
         columns: this.leadsExportColumns,
         data: leadsData,
+        quoted: true,
       });
     },
   },

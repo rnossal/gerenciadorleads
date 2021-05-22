@@ -14,40 +14,27 @@
         <ListItemMeta title="Cursos de interesse" :description="coursesOfInterest" />
       </ListItem>
       <ListItem>
-        <ListItemMeta title="Criado por" :description="row.createdBy.name" />
+        <ListItemMeta title="Observações" :description="row.observations" />
       </ListItem>
       <ListItem>
-        <ListItemMeta title="Observações" :description="row.observations" />
+        <ListItemMeta title="Criado por" :description="row.createdBy.name" />
       </ListItem>
     </List>
   </div>
 </template>
 
 <script>
+import arrayObjectAttributeToText from '@/mixins/arrayObjectAttributeToText';
+
 export default {
   name: 'LeadTableInfo',
+  mixins: [arrayObjectAttributeToText],
   props: {
     row: Object,
   },
   computed: {
     coursesOfInterest() {
-      let coursesOfInterest = '';
-
-      if (this.row.coursesOfInterest) {
-        this.row.coursesOfInterest.forEach((course, index) => {
-          const deviceName = course.name;
-
-          if ((this.row.coursesOfInterest.length - 2) > index) {
-            coursesOfInterest += `${deviceName}, `;
-          } else if ((this.row.coursesOfInterest.length - 1) > index) {
-            coursesOfInterest += `${deviceName} e `;
-          } else {
-            coursesOfInterest += deviceName;
-          }
-        });
-      }
-
-      return coursesOfInterest;
+      return this.arrayObjectAttributeToText(this.row.coursesOfInterest, 'name');
     },
   },
 };
