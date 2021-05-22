@@ -18,80 +18,85 @@
         />
       </Card>
       <Divider />
-      <Card
-        v-if="reportView"
-        dis-hover
+      <div
+        id="leads-list"
+        v-if="leads && leads.length > 0"
       >
-        <div id="table-actions">
-          <Button
-            id="export-table-btn"
-            type="success"
-            @click="exportTable"
-          >
-            Exportar dados
-            <Icon type="ios-grid"></Icon>
-          </Button>
-        </div>
-        <Table
-          ref="leadsTable"
-          :columns="leadsColumns"
-          :data="leads"
-          stripe
-          border
+        <Card
+          v-if="reportView"
+          dis-hover
         >
-          <template slot-scope="{ row }" slot="actions">
-            <Row
-              type="flex"
-              justify="center"
-              :gutter="5"
+          <div id="table-actions">
+            <Button
+              id="export-table-btn"
+              type="success"
+              @click="exportTable"
             >
-              <i-col>
-                <Button
-                  type="primary"
-                  @click="mountUpdateLead(row)"
-                  :style="{ width: '75px' }"
-                >Editar</Button>
-              </i-col>
-              <i-col>
-                <Button
-                  type="error"
-                  @click="deleteLead(row)"
-                  :style="{ width: '75px' }"
-                >Excluir</Button>
-              </i-col>
-            </Row>
-          </template>
-        </Table>
-      </Card>
-      <Card
-        v-else
-        class="lead-card"
-        v-for="leadItem in leads"
-        :key="leadItem.id"
-        dis-hover
-      >
-        <p slot="title">{{leadItem.name}}</p>
-        <Row>
-          <Col span="20">
-            <p><b>Email: </b>{{leadItem.email}}</p>
-            <p v-if="leadItem.phone"><b>Telefone: </b>{{leadItem.phone}}</p>
-            <p v-if="leadItem.createdBy"><b>Criador por: </b>{{leadItem.createdBy.name}}</p>
-            <p v-if="leadItem.observations"><b>Observações: </b>{{leadItem.observations}}</p>
-          </Col>
-          <Col class="lead-actions" span="4">
-            <Button
-              class="lead-action"
-              type="primary"
-              @click="mountUpdateLead(leadItem)"
-            >Editar</Button>
-            <Button
-              class="lead-action"
-              type="error"
-              @click="deleteLead(leadItem)"
-            >Excluir</Button>
-          </Col>
-        </Row>
-      </Card>
+              Exportar dados
+              <Icon type="ios-grid"></Icon>
+            </Button>
+          </div>
+          <Table
+            ref="leadsTable"
+            :columns="leadsColumns"
+            :data="leads"
+            stripe
+            border
+          >
+            <template slot-scope="{ row }" slot="actions">
+              <Row
+                type="flex"
+                justify="center"
+                :gutter="5"
+              >
+                <i-col>
+                  <Button
+                    type="primary"
+                    @click="mountUpdateLead(row)"
+                    :style="{ width: '75px' }"
+                  >Editar</Button>
+                </i-col>
+                <i-col>
+                  <Button
+                    type="error"
+                    @click="deleteLead(row)"
+                    :style="{ width: '75px' }"
+                  >Excluir</Button>
+                </i-col>
+              </Row>
+            </template>
+          </Table>
+        </Card>
+        <Card
+          v-else
+          class="lead-card"
+          v-for="leadItem in leads"
+          :key="leadItem.id"
+          dis-hover
+        >
+          <p slot="title">{{leadItem.name}}</p>
+          <Row>
+            <Col span="20">
+              <p><b>Email: </b>{{leadItem.email}}</p>
+              <p v-if="leadItem.phone"><b>Telefone: </b>{{leadItem.phone}}</p>
+              <p v-if="leadItem.createdBy"><b>Criador por: </b>{{leadItem.createdBy.name}}</p>
+              <p v-if="leadItem.observations"><b>Observações: </b>{{leadItem.observations}}</p>
+            </Col>
+            <Col class="lead-actions" span="4">
+              <Button
+                class="lead-action"
+                type="primary"
+                @click="mountUpdateLead(leadItem)"
+              >Editar</Button>
+              <Button
+                class="lead-action"
+                type="error"
+                @click="deleteLead(leadItem)"
+              >Excluir</Button>
+            </Col>
+          </Row>
+        </Card>
+      </div>
       <h1 id="no-leads" v-if="!leads || leads.length === 0">Não existem leads cadastrados.</h1>
     </Content>
     <Modal
