@@ -11,8 +11,8 @@ export const authentication = {
     };
   },
 };
-export const users = {
-  location: join(domain, '/users/'),
+export const courses = {
+  location: join(domain, '/courses/'),
   get methods() {
     return {
       get: join(this.location, '/'),
@@ -33,10 +33,22 @@ export const leads = {
     };
   },
 };
+export const users = {
+  location: join(domain, '/users/'),
+  get methods() {
+    return {
+      get: join(this.location, '/'),
+      post: join(this.location, '/'),
+      update: join(this.location, '/'),
+      delete: join(this.location, '/'),
+    };
+  },
+};
 
 export default {
-  domain,
   authentication,
-  users,
+  courses,
+  domain,
   leads,
+  users,
 };

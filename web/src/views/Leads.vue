@@ -142,7 +142,7 @@
 <script>
 import LeadTableInfo from '@/components/Leads/LeadTableInfo.vue';
 import handleError from '@/mixins/handleError';
-import { leads } from '@/assets/config';
+import { leads, courses } from '@/assets/config';
 
 export default {
   name: 'Leads',
@@ -208,6 +208,7 @@ export default {
       },
     ],
     leads: [],
+    courses: [],
     searchTerm: null,
     showCreateLead: false,
     creatingLead: false,
@@ -257,7 +258,7 @@ export default {
         const response = await this.$http.get(leads.methods.get, {
           params: {
             query: `{
-              leads(
+              leads (
                 name: "${this.searchTerm ? this.searchTerm : ''}",
                 email: "${this.searchTerm ? this.searchTerm : ''}",
                 phone: "${this.searchTerm ? this.searchTerm : ''}",
@@ -291,6 +292,38 @@ export default {
         }
       } else {
         this.handleError('Falha ao listar os leads', 'Sem resposta do servidor');
+      }
+    },
+    async fetchCourses() {
+      let graphqlResponse = null;
+
+      try {
+        const response = await this.$http.get(courses.methods.get, {
+          params: {
+            query: `{
+              courses {
+                id
+                name
+              }
+            }`,
+          },
+        });
+
+        graphqlResponse = response.data;
+      } catch (e) {
+        this.handleError('Falha ao listar os cursos disponíveis', e);
+
+        return;
+      }
+
+      if (graphqlResponse) {
+        if (graphqlResponse.errors) {
+          this.handleError('Falha ao listar os cursos disponíveis', graphqlResponse);
+        } else {
+          this.courses = graphqlResponse.data.courses;
+        }
+      } else {
+        this.handleError('Falha ao listar os cursos disponíveis', 'Sem resposta do servidor');
       }
     },
     async createLead() {
@@ -410,6 +443,7 @@ export default {
     this.$Spin.show();
   },
   async mounted() {
+    await this.fetchCourses();
     await this.fetch();
     this.$Spin.hide();
   },
