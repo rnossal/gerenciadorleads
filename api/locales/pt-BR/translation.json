@@ -12,5 +12,6 @@
   "INVALID_EMAIL": "Você deve informar um e-mail válido.",
   "INVALID_PHONE": "Você deve informar um telefone válido.",
   "INVALID_PARAMETERS": "Parâmetros inválidos na requisição.",
-  "LEAD_NOT_FOUND": "Lead não localizado."
+  "LEAD_NOT_FOUND": "Lead não localizado.",
+  "COURSE_NOT_FOUND": "Curso não localizado."
 }

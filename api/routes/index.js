@@ -1,9 +1,11 @@
 import authentication from './authentication.js';
-import users from './users.js';
+import courses from './courses.js';
 import leads from './leads.js';
+import users from './users.js';
 
 export default {
   authentication,
-  users,
+  courses,
   leads,
+  users,
 };

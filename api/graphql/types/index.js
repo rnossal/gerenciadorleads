@@ -1,7 +1,9 @@
-import { UserType } from './user.js';
+import { CourseType } from './course.js';
 import { LeadType } from './lead.js';
+import { UserType } from './user.js';
 
 export default {
-  UserType,
   LeadType,
+  CourseType,
+  UserType,
 };

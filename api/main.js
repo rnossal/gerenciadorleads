@@ -82,6 +82,7 @@ if (process.env.ENABLE_HTTPS && process.env.ENABLE_HTTPS.toLowerCase() === 'true
 app.use('/api/authentication', routes.authentication);
 app.use('/api/users', routes.users);
 app.use('/api/leads', routes.leads);
+app.use('/api/courses', routes.courses);
 app.use(express.static('public'));
 
 connect().then(async () => {

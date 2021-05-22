@@ -12,5 +12,6 @@
   "INVALID_EMAIL": "You must enter a valid email.",
   "INVALID_PHONE": "You must enter a valid phone number.",
   "INVALID_PARAMETERS": "Invalid parameters in the request.",
-  "LEAD_NOT_FOUND": "Lead not found."
+  "LEAD_NOT_FOUND": "Lead not found.",
+  "COURSE_NOT_FOUND": "Course not found."
 }

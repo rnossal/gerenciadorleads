@@ -1,10 +1,16 @@
+import mongoose from 'mongoose';
+
 export const LeadsRoot = {
   lead: async (args, req) => {
     const { models } = req.context;
 
-    return models.Lead.findById(args.id).populate({
-      path: 'createdBy',
-    });
+    if (mongoose.Types.ObjectId.isValid(args.id)) {
+      return models.Lead.findById(args.id).populate({
+        path: 'createdBy',
+      });
+    }
+
+    return [];
   },
   leads: async (args, req) => {
     const { models } = req.context;
