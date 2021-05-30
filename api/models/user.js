@@ -5,7 +5,10 @@ export const schema = new mongoose.Schema({
   username: String,
   email: String,
   password: String,
-  admin: Boolean,
+  admin: {
+    type: Boolean,
+    default: false
+  },
 }, {
   timestamps: true,
   versionKey: false,
