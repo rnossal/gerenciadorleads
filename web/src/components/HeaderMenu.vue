@@ -10,14 +10,14 @@
       <div id="menu-container">
         <div id="menu-left">
           <MenuItem name="leads" :to="{ name: 'leads' }">Início</MenuItem>
-          <!-- <Submenu name="cadsub">
+          <Submenu name="cadsub">
             <template slot="title">
               <span>Cadastros</span>
             </template>
-            <MenuItem name="courses-menu" :to="{ name: 'manage-courses' }">
-              <Icon type="ios-people" />Cursos
+            <MenuItem name="courses-menu" :to="{ name: 'courses' }">
+              Cursos
             </MenuItem>
-          </Submenu> -->
+          </Submenu>
         </div>
         <div id="menu-middle">
         </div>

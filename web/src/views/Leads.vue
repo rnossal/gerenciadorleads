@@ -429,7 +429,7 @@ export default {
     },
     async deleteLead(lead) {
       this.$Modal.confirm({
-        title: 'Confirmação de deleção?',
+        title: 'Confirmação de deleção',
         content: `Você tem certeza que deseja deletar o lead ${lead.name}?`,
         onOk: async () => {
           try {
@@ -446,10 +446,10 @@ export default {
                 desc: 'Lead excluído com sucesso',
               });
             } else {
-              this.handleError('Falha ao excluir a turma.');
+              this.handleError('Falha ao excluir o lead.');
             }
           } catch (e) {
-            this.handleError('Falha ao excluir a turma.', e);
+            this.handleError('Falha ao excluir o lead.', e);
           }
         },
         okText: 'Excluir',

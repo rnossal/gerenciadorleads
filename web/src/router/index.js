@@ -32,6 +32,12 @@ const routes = [
     component: () => import(/* webpackChunkName: "preferences" */ '@/views/UserPreferences.vue'),
   },
   {
+    path: '/courses',
+    name: 'courses',
+    meta: { title: 'Cursos' },
+    component: () => import(/* webpackChunkName: "courses" */ '@/views/Courses.vue'),
+  },
+  {
     path: '*',
     name: 'not-found',
     meta: { title: 'Página não encontrada' },
