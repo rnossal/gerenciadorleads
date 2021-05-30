@@ -36,36 +36,39 @@
               <Icon type="ios-grid"></Icon>
             </Button>
           </div>
-          <Table
-            ref="leadsTable"
-            :columns="leadsColumns"
-            :data="leads"
-            stripe
-            border
-          >
-            <template slot-scope="{ row }" slot="actions">
-              <Row
-                type="flex"
-                justify="center"
-                :gutter="5"
-              >
-                <i-col>
-                  <Button
-                    type="primary"
-                    @click="mountUpdateLead(row)"
-                    :style="{ width: '75px' }"
-                  >Editar</Button>
-                </i-col>
-                <i-col>
-                  <Button
-                    type="error"
-                    @click="deleteLead(row)"
-                    :style="{ width: '75px' }"
-                  >Excluir</Button>
-                </i-col>
-              </Row>
-            </template>
-          </Table>
+          <div id="table-wrapper">
+            <Table
+              id="leads-table"
+              ref="leadsTable"
+              :columns="leadsColumns"
+              :data="leads"
+              stripe
+              border
+            >
+              <template slot-scope="{ row }" slot="actions">
+                <Row
+                  type="flex"
+                  justify="center"
+                  :gutter="5"
+                >
+                  <i-col>
+                    <Button
+                      type="primary"
+                      @click="mountUpdateLead(row)"
+                      :style="{ width: '75px' }"
+                    >Editar</Button>
+                  </i-col>
+                  <i-col>
+                    <Button
+                      type="error"
+                      @click="deleteLead(row)"
+                      :style="{ width: '75px' }"
+                    >Excluir</Button>
+                  </i-col>
+                </Row>
+              </template>
+            </Table>
+          </div>
         </Card>
         <Card
           v-else
@@ -521,5 +524,13 @@ export default {
 
 #export-table-btn {
   margin-left: auto;
+}
+
+#table-wrapper {
+  overflow-x: scroll;
+}
+
+#leads-table {
+  min-width: 700px;
 }
 </style>

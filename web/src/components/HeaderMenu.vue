@@ -1,7 +1,8 @@
 <template>
   <div class="header-menu">
     <Menu
-      mode="horizontal"
+      id="app-menu"
+      :mode="viewWidth > 450 ? 'horizontal' : 'vertical'"
       theme="light"
       :active-name="$route.name"
       width="auto"
@@ -9,6 +10,14 @@
       <div id="menu-container">
         <div id="menu-left">
           <MenuItem name="leads" :to="{ name: 'leads' }">Início</MenuItem>
+          <!-- <Submenu name="cadsub">
+            <template slot="title">
+              <span>Cadastros</span>
+            </template>
+            <MenuItem name="courses-menu" :to="{ name: 'manage-courses' }">
+              <Icon type="ios-people" />Cursos
+            </MenuItem>
+          </Submenu> -->
         </div>
         <div id="menu-middle">
         </div>
@@ -42,70 +51,66 @@ import logout from '@/mixins/logout';
 export default {
   name: 'HeaderMenu',
   mixins: [logout],
+  data: () => ({
+    viewWidth: 0,
+  }),
+  methods: {
+    handleResize() {
+      this.viewWidth = window.innerWidth;
+    },
+  },
   computed: {
     isAdmin() {
       return this.$store.state.user.admin;
     },
   },
+  created() {
+    window.addEventListener('resize', this.handleResize);
+    this.handleResize();
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.handleResize);
+  },
 };
 </script>
 
 <style lang="less">
-.header-menu {
-  z-index: 99;
-  position: sticky !important;
-  top: 0;
+#app-menu {
+  height: auto;
 }
 
-#menu-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-
-  * {
-    user-select: none;
+#usersub {
+  .ivu-menu-submenu-title {
+    display: flex;
+    align-items: center;
   }
 }
 
-#menu-left, #menu-middle, #menu-right {
-  display: flex;
-  flex-basis: 100%;
-}
-
-#menu-left {
-  justify-content: flex-start;
-}
-
-#menu-middle {
-  align-items: center;
-  justify-content: center;
-}
-
-#menu-right {
-  justify-content: flex-end;
-}
-
-.ivu-menu-horizontal {
-  height: 50px !important;
-  line-height: 50px !important;
-}
-
-.editor-actions {
-  margin-left: 5px;
-}
-
-// #usersub {
-//   .ivu-menu-submenu-title {
-//     display: flex;
-//     align-items: center;
-//   }
-// }
-
 #user-name {
-  max-width: 180px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   margin-right: 5px;
+}
+
+.ivu-menu-horizontal {
+  #user-name {
+    max-width: 150px;
+  }
+  .header-menu {
+    z-index: 99;
+    position: sticky !important;
+    top: 0;
+  }
+
+  #menu-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    * {
+      user-select: none;
+    }
+  }
 }
 </style>
