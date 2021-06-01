@@ -1,6 +1,6 @@
 import join from 'url-join';
 
-export const domain = 'http://localhost:3000/api';
+export const domain = process?.env?.VUE_APP_ENDPOINT;
 export const authentication = {
   location: join(domain, '/authentication/'),
   get methods() {
