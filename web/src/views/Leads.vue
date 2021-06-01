@@ -4,18 +4,50 @@
       <h1>Lista de Leads</h1>
       <Divider />
       <Card class="leads-actions" :dis-hover="true">
-        <Button
-          type="primary"
-          class="action-button"
-          @click="showCreateLead = true"
-        >Criar lead</Button>
-        <Input
-          search
-          enter-button
-          v-model="searchTerm"
-          @on-search="fetch"
-          placeholder="Pesquisar..."
-        />
+        <div id="lead-search">
+          <Button
+            type="primary"
+            class="action-button"
+            @click="showCreateLead = true"
+          >Criar lead</Button>
+        </div>
+        <br />
+        <div>
+          <Collapse simple>
+            <Panel name="1">
+              Filtros
+              <div slot="content">
+                <i-form
+                  :model="searchLeadModel.formData"
+                  :disabled="creatingLead"
+                  @submit.native.prevent
+                >
+                  <FormItem prop="searchTerm" label="Nome / E-mail / Telefone / Observações">
+                    <Input
+                      search
+                      enter-button
+                      v-model="searchLeadModel.formData.searchTerm"
+                      @on-search="fetch"
+                      placeholder="Pesquisar..."
+                    />
+                  </FormItem>
+                  <FormItem prop="coursesOfInterest" label="Cursos de interesse">
+                    <Select v-model="searchLeadModel.formData.coursesOfInterest" multiple>
+                      <Option
+                        v-for="course in courses"
+                        :value="course.id"
+                        :key="course.id"
+                      >{{ course.name }}</Option>
+                    </Select>
+                  </FormItem>
+                  <FormItem prop="coursesOfInterest">
+                    <Button @click="fetch">Pesquisar</Button>
+                  </FormItem>
+                </i-form>
+              </div>
+            </Panel>
+          </Collapse>
+        </div>
       </Card>
       <Divider />
       <div
@@ -233,9 +265,14 @@ export default {
     ],
     leads: [],
     courses: [],
-    searchTerm: null,
     showCreateLead: false,
     creatingLead: false,
+    searchLeadModel: {
+      formData: {
+        searchTerm: null,
+        coursesOfInterest: [],
+      },
+    },
     createLeadModel: {
       formData: {
         leadId: null,
@@ -284,10 +321,10 @@ export default {
           params: {
             query: `{
               leads (
-                name: "${this.searchTerm ? this.searchTerm : ''}",
-                email: "${this.searchTerm ? this.searchTerm : ''}",
-                phone: "${this.searchTerm ? this.searchTerm : ''}",
-                observations: "${this.searchTerm ? this.searchTerm : ''}"
+                name: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}",
+                email: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}",
+                phone: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}",
+                observations: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}"
               ) {
                 id
                 name
@@ -496,7 +533,7 @@ export default {
 
 <style lang="less">
 .leads-actions {
-  .ivu-card-body {
+  #lead-search {
     display: flex;
   }
 }
