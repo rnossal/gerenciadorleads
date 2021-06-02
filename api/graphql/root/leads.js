@@ -21,7 +21,7 @@ export const LeadsRoot = {
     const { models } = req.context;
 
     const query = {};
-    if (args.name || args.email || args.phone || args.observations) {
+    if (args.name || args.email || args.phone || args.observations || (Array.isArray(args.coursesOfInterest) && args.coursesOfInterest.length > 0)) {
       query.$or = [];
 
       if (args.name) {
@@ -36,6 +36,10 @@ export const LeadsRoot = {
       if (args.observations) {
         query.$or.push({ observations: new RegExp(`.*${args.observations.replace(/[-\\/\\^$*+?.()|[\]{}]/g, '\\$&')}.*`, 'gi') });
       }
+      if (Array.isArray(args.coursesOfInterest) && args.coursesOfInterest.length > 0) {
+        query.$or.push({ coursesOfInterest: { $in: args.coursesOfInterest } });
+      }
+      console.log(query);
     }
 
     return models.Lead.find(query).populate([

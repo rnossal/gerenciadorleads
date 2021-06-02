@@ -23,11 +23,16 @@
                   @submit.native.prevent
                 >
                   <FormItem prop="searchTerm" label="Nome / E-mail / Telefone / Observações">
-                    <Input
+                    <!-- <Input
                       search
                       enter-button
                       v-model="searchLeadModel.formData.searchTerm"
                       @on-search="fetch"
+                      placeholder="Pesquisar..."
+                    /> -->
+                    <Input
+                      search
+                      v-model="searchLeadModel.formData.searchTerm"
                       placeholder="Pesquisar..."
                     />
                   </FormItem>
@@ -40,8 +45,9 @@
                       >{{ course.name }}</Option>
                     </Select>
                   </FormItem>
-                  <FormItem prop="coursesOfInterest">
-                    <Button @click="fetch">Pesquisar</Button>
+                  <FormItem>
+                    <Button id="clear-filters" @click="clearSearch">Limpar filtros</Button>
+                    <Button @click="fetch" type="primary">Pesquisar</Button>
                   </FormItem>
                 </i-form>
               </div>
@@ -325,6 +331,7 @@ export default {
                 email: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}",
                 phone: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}",
                 observations: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}"
+                coursesOfInterest: []
               ) {
                 id
                 name
@@ -359,6 +366,12 @@ export default {
       } else {
         this.handleError('Falha ao listar os leads', 'Sem resposta do servidor');
       }
+    },
+    clearSearch() {
+      this.searchLeadModel.formData.searchTerm = null;
+      this.searchLeadModel.formData.coursesOfInterest = [];
+
+      this.fetch();
     },
     async fetchCourses() {
       let graphqlResponse = null;
@@ -569,5 +582,8 @@ export default {
 
 #leads-table {
   min-width: 700px;
+}
+#clear-filters {
+  margin-right: 5px;
 }
 </style>
