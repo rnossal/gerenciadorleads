@@ -11,7 +11,13 @@ export const LeadsRoot = {
         },
         {
           path: 'coursesOfInterest',
-        }
+        },
+        {
+          path: 'followUpHistory',
+          populate: {
+            path: 'createdBy',
+          },
+        },
       ]);
     }
 

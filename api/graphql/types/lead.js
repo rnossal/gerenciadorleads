@@ -7,6 +7,7 @@ const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLList,
+  GraphQLInt,
 } = graphQL;
 
 export const LeadType = new GraphQLObjectType({
@@ -35,7 +36,10 @@ export const LeadType = new GraphQLObjectType({
     },
     followUpHistory: {
       type: GraphQLList(FollowUpType)
-    }
+    },
+    status: {
+      type: GraphQLInt,
+    },
   }),
 });
 

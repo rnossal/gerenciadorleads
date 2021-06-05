@@ -60,6 +60,7 @@ router.post('/followup', authenticate(), async (req, res) => {
   if (!leadModel) return res.status(400).json({ message: req.t('LEAD_NOT_FOUND') });
 
   try {
+    leadModel.status = status;
     leadModel.followUpHistory.push(models.FollowUp({
       status,
       description,
