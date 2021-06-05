@@ -16,7 +16,7 @@
           <Collapse simple>
             <Panel name="1">
               Filtros
-              <div slot="content">
+              <div slot="content" id="filter-content">
                 <i-form
                   :model="searchLeadModel.formData"
                   :disabled="creatingLead"
@@ -583,7 +583,12 @@ export default {
 #leads-table {
   min-width: 700px;
 }
+
 #clear-filters {
   margin-right: 5px;
+}
+
+#filter-content {
+  user-select: none;
 }
 </style>
