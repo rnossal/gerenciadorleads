@@ -61,7 +61,6 @@
         v-if="leads && leads.length > 0"
       >
         <Card
-          v-if="reportView"
           dis-hover
         >
           <div id="table-actions">
@@ -74,68 +73,55 @@
               <Icon type="ios-grid"></Icon>
             </Button>
           </div>
-          <div id="table-wrapper">
-            <Table
-              id="leads-table"
-              ref="leadsTable"
-              :columns="leadsColumns"
-              :data="leads"
-              stripe
-              border
-            >
-              <template slot-scope="{ row }" slot="actions">
-                <Row
-                  type="flex"
-                  justify="center"
-                  :gutter="5"
-                >
-                  <i-col>
-                    <Button
-                      type="primary"
-                      @click="mountUpdateLead(row)"
-                      :style="{ width: '75px' }"
-                    >Editar</Button>
-                  </i-col>
-                  <i-col>
-                    <Button
-                      type="error"
-                      @click="deleteLead(row)"
-                      :style="{ width: '75px' }"
-                    >Excluir</Button>
-                  </i-col>
-                </Row>
-              </template>
-            </Table>
-          </div>
-        </Card>
-        <Card
-          v-else
-          class="lead-card"
-          v-for="leadItem in leads"
-          :key="leadItem.id"
-          dis-hover
-        >
-          <p slot="title">{{leadItem.name}}</p>
-          <Row>
-            <Col span="20">
-              <p><b>Email: </b>{{leadItem.email}}</p>
-              <p v-if="leadItem.phone"><b>Telefone: </b>{{leadItem.phone}}</p>
-              <p v-if="leadItem.createdBy"><b>Criador por: </b>{{leadItem.createdBy.name}}</p>
-              <p v-if="leadItem.observations"><b>Observações: </b>{{leadItem.observations}}</p>
-            </Col>
-            <Col class="lead-actions" span="4">
-              <Button
-                class="lead-action"
-                type="primary"
-                @click="mountUpdateLead(leadItem)"
-              >Editar</Button>
-              <Button
-                class="lead-action"
-                type="error"
-                @click="deleteLead(leadItem)"
-              >Excluir</Button>
-            </Col>
-          </Row>
+          <Table
+            id="leads-table"
+            ref="leadsTable"
+            :columns="leadsColumns"
+            :data="leads"
+            stripe
+            border
+          >
+            <template slot-scope="{ row }" slot="status">
+              <Badge :color="statuses[row.status].color" :text="statuses[row.status].text">
+              </Badge>
+            </template>
+            <template slot-scope="{ row }" slot="actions">
+              <Row
+                class="actions-row"
+                type="flex"
+                justify="center"
+                :gutter="5"
+              >
+                <i-col>
+                  <Button
+                    type="primary"
+                    @click="mountUpdateLead(row)"
+                    :style="{ width: '75px' }"
+                  >Editar</Button>
+                </i-col>
+                <i-col>
+                  <Button
+                    type="error"
+                    @click="deleteLead(row)"
+                    :style="{ width: '75px' }"
+                  >Excluir</Button>
+                </i-col>
+              </Row>
+              <Row
+                class="actions-row"
+                type="flex"
+                justify="center"
+                :gutter="5"
+              >
+                <i-col>
+                  <Button
+                    type="info"
+                    @click="showFollowUp(row.id)"
+                  >Acompanhamentos</Button>
+                </i-col>
+              </Row>
+            </template>
+          </Table>
         </Card>
       </div>
       <h1 id="no-leads" v-else>Não existem leads cadastrados.</h1>
@@ -195,6 +181,7 @@
 <script>
 import CInput from '@/components/CInput.vue';
 import LeadTableInfo from '@/components/Leads/LeadTableInfo.vue';
+import FollowUp from '@/components/Leads/FollowUp.vue';
 import handleError from '@/mixins/handleError';
 import arrayObjectAttributeToText from '@/mixins/arrayObjectAttributeToText';
 import { leads, courses } from '@/assets/config';
@@ -206,7 +193,28 @@ export default {
     CInput,
   },
   data: () => ({
-    reportView: true,
+    statuses: {
+      0: {
+        color: 'gray',
+        text: 'Nenhum',
+      },
+      1: {
+        color: '#52c41a',
+        text: 'Interessado',
+      },
+      2: {
+        color: '#f5222d',
+        text: 'Sem interesse',
+      },
+      3: {
+        color: '#fadb14',
+        text: 'A contatar',
+      },
+    },
+    leads: [],
+    courses: [],
+    showCreateLead: false,
+    creatingLead: false,
     leadsColumns: [
       {
         type: 'expand',
@@ -218,32 +226,48 @@ export default {
         }),
       },
       {
+        title: 'Status',
+        slot: 'status',
+        ellipsis: true,
+        minWidth: 150,
+        maxWidth: 150,
+      },
+      {
         title: 'Nome',
         key: 'name',
         ellipsis: true,
+        minWidth: 150,
       },
       {
         title: 'E-mail',
         key: 'email',
         ellipsis: true,
+        minWidth: 150,
       },
       {
         title: 'Telefone',
         key: 'phone',
         ellipsis: true,
+        minWidth: 150,
       },
       {
         title: 'Observações',
         key: 'observations',
         ellipsis: true,
+        minWidth: 150,
       },
       {
         title: 'Ações',
         slot: 'actions',
         align: 'center',
+        width: 195,
       },
     ],
     leadsExportColumns: [
+      {
+        title: 'Status',
+        key: 'status',
+      },
       {
         title: 'Nome',
         key: 'name',
@@ -269,10 +293,6 @@ export default {
         key: 'createdBy',
       },
     ],
-    leads: [],
-    courses: [],
-    showCreateLead: false,
-    creatingLead: false,
     searchLeadModel: {
       formData: {
         searchTerm: null,
@@ -345,6 +365,7 @@ export default {
                 createdBy {
                   name
                 }
+                status
               }
             }`,
           },
@@ -517,6 +538,7 @@ export default {
     },
     exportTable() {
       const leadsData = this.leads.map((l) => ({
+        status: this.statuses[l.status].text,
         name: l.name,
         email: l.email,
         phone: l.phone,
@@ -530,6 +552,19 @@ export default {
         columns: this.leadsExportColumns,
         data: leadsData,
         quoted: true,
+      });
+    },
+    showFollowUp(leadId) {
+      this.$Modal.info({
+        title: 'Acompanhamento',
+        okText: 'Fechar',
+        closable: true,
+        width: 700,
+        render: (h) => h(FollowUp, {
+          props: {
+            leadId,
+          },
+        }),
       });
     },
   },
@@ -576,19 +611,15 @@ export default {
   margin-left: auto;
 }
 
-#table-wrapper {
-  overflow-x: scroll;
-}
-
-#leads-table {
-  min-width: 700px;
-}
-
 #clear-filters {
   margin-right: 5px;
 }
 
 #filter-content {
   user-select: none;
+}
+
+.actions-row {
+  margin: 5px 0;
 }
 </style>
