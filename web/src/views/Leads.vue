@@ -175,13 +175,37 @@
         >{{createLeadModel.formData.leadId === null ? 'Criar' : 'Atualizar'}}</Button>
       </div>
     </Modal>
+    <Modal
+      v-model="showFollowUpModal"
+      @on-visible-change="modalClosed"
+      class-name="followup-modal"
+      title="Acompanhamentos"
+      width="700"
+    >
+      <div class="follow-up">
+        <Timeline
+          v-if="lead && lead.followUpHistory"
+        >
+          <TimelineItem
+            v-for="history in lead.followUpHistory"
+            :key="history.id"
+            :color="statuses[history.status].color"
+          >
+            <p class="time">
+              <!-- eslint-disable-next-line max-len -->
+              ({{statuses[history.status].text}}) {{moment(history.createdAt).format('DD/MM/YYYY HH:mm:ss')}} - {{history.createdBy.name}}
+            </p>
+            <p class="content">{{history.description}}</p>
+          </TimelineItem>
+        </Timeline>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
 import CInput from '@/components/CInput.vue';
 import LeadTableInfo from '@/components/Leads/LeadTableInfo.vue';
-import FollowUp from '@/components/Leads/FollowUp.vue';
 import handleError from '@/mixins/handleError';
 import arrayObjectAttributeToText from '@/mixins/arrayObjectAttributeToText';
 import { leads, courses } from '@/assets/config';
@@ -212,9 +236,11 @@ export default {
       },
     },
     leads: [],
+    lead: null,
     courses: [],
     showCreateLead: false,
     creatingLead: false,
+    showFollowUpModal: false,
     leadsColumns: [
       {
         type: 'expand',
@@ -388,6 +414,65 @@ export default {
         this.handleError('Falha ao listar os leads', 'Sem resposta do servidor');
       }
     },
+    async fetchLead(leadId) {
+      let graphqlResponse = null;
+
+      try {
+        const response = await this.$http.get(leads.methods.get, {
+          params: {
+            query: `{
+              lead (
+                id: "${leadId}",
+              ) {
+                id
+                name
+                email
+                phone
+                coursesOfInterest {
+                  id
+                  name
+                }
+                observations
+                createdBy {
+                  name
+                }
+                status
+                followUpHistory {
+                  id,
+                  status,
+                  description
+                  createdAt
+                  createdBy {
+                    name
+                  }
+                }
+              }
+            }`,
+          },
+        });
+
+        graphqlResponse = response.data;
+      } catch (e) {
+        this.handleError('Falha ao recuperar o lead', e);
+
+        return;
+      }
+
+      if (graphqlResponse) {
+        if (graphqlResponse.errors) {
+          this.handleError('Falha ao recuperar o lead', graphqlResponse);
+        } else {
+          this.lead = graphqlResponse.data.lead;
+          if (Array.isArray(this.lead?.followUpHistory)) {
+            this.lead.followUpHistory.sort(
+              (a, b) => this.moment(b.createdAt) - this.moment(a.createdAt),
+            );
+          }
+        }
+      } else {
+        this.handleError('Falha ao recuperar o lead', 'Sem resposta do servidor');
+      }
+    },
     clearSearch() {
       this.searchLeadModel.formData.searchTerm = null;
       this.searchLeadModel.formData.coursesOfInterest = [];
@@ -554,18 +639,12 @@ export default {
         quoted: true,
       });
     },
-    showFollowUp(leadId) {
-      this.$Modal.info({
-        title: 'Acompanhamento',
-        okText: 'Fechar',
-        closable: true,
-        width: 700,
-        render: (h) => h(FollowUp, {
-          props: {
-            leadId,
-          },
-        }),
-      });
+    async showFollowUp(leadId) {
+      this.$Spin.show();
+      await this.fetchLead(leadId);
+      this.$Spin.hide();
+
+      this.showFollowUpModal = true;
     },
   },
   beforeMount() {
@@ -621,5 +700,35 @@ export default {
 
 .actions-row {
   margin: 5px 0;
+}
+
+.follow-up {
+  margin-top: 10px;
+  margin-left: 8px;
+}
+
+.time{
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.content{
+  padding-left: 5px;
+}
+
+.followup-modal{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .ivu-modal{
+    top: 0;
+    max-height: 100vh;
+
+    .ivu-modal-body {
+      max-height: 80vh;
+      overflow-x: scroll;
+    }
+  }
 }
 </style>
