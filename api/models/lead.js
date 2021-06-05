@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { schema as FollowUp } from './followUp.js';
 
 export const schema = new mongoose.Schema({
   name: String,
@@ -11,6 +12,7 @@ export const schema = new mongoose.Schema({
       ref: 'Course',
     },
   ],
+  followUpHistory: [ FollowUp ],
   createdBy: {
     type: mongoose.Types.ObjectId,
     ref: 'User',

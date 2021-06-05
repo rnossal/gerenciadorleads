@@ -44,6 +44,40 @@ router.post('/', authenticate(), async (req, res) => {
   });
 });
 
+router.post('/followup', authenticate(), async (req, res) => {
+  const { user } = req;
+  const { models } = req.context;
+  const {
+    leadId,
+    status,
+    description,
+  } = req.body;
+
+  let leadModel = null;
+  if (mongoose.Types.ObjectId.isValid(leadId)) {
+    leadModel = await models.Lead.findById(leadId);
+  }
+  if (!leadModel) return res.status(400).json({ message: req.t('LEAD_NOT_FOUND') });
+
+  try {
+    leadModel.followUpHistory.push(models.FollowUp({
+      status,
+      description,
+      createdBy: user.id,
+    }));
+
+    const leadSaved = await leadModel.save();
+
+    return res.json({
+      lead: leadSaved,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      message: error,
+    })
+  }
+});
+
 router.put('/', authenticate(), async (req, res) => {
   const { models } = req.context;
   const {
@@ -100,7 +134,6 @@ router.delete('/', authenticate(), async (req, res) => {
   if (mongoose.Types.ObjectId.isValid(leadId)) {
     leadModel = await models.Lead.findById(leadId);
   }
-
   if (!leadModel) return res.status(400).json({ message: req.t('LEAD_NOT_FOUND') });
 
   const deleted = await leadModel.remove();
