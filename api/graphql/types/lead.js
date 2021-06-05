@@ -1,6 +1,7 @@
 import graphQL from 'graphql';
 import { CourseType } from './course.js'
 import { UserType } from './user.js'
+import { FollowUpType } from './followUp.js'
 
 const {
   GraphQLObjectType,
@@ -32,6 +33,9 @@ export const LeadType = new GraphQLObjectType({
     createdBy: {
       type: UserType,
     },
+    followUpHistory: {
+      type: GraphQLList(FollowUpType)
+    }
   }),
 });
 
