@@ -39,7 +39,6 @@ export const LeadsRoot = {
       if (Array.isArray(args.coursesOfInterest) && args.coursesOfInterest.length > 0) {
         query.$or.push({ coursesOfInterest: { $in: args.coursesOfInterest } });
       }
-      console.log(query);
     }
 
     return models.Lead.find(query).populate([
