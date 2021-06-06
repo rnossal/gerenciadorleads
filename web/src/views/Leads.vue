@@ -414,6 +414,13 @@ export default {
         description: null,
       },
       formRules: {
+        status: [
+          {
+            required: true,
+            message: 'Informe um status',
+            trigger: 'blur',
+          },
+        ],
         description: [
           {
             required: true,
@@ -595,7 +602,7 @@ export default {
         return;
       }
 
-      this.fetch();
+      await this.fetch();
 
       this.creatingLead = false;
       this.showCreateLead = false;
@@ -615,15 +622,15 @@ export default {
           },
         );
       } catch (e) {
-        this.handleError('Falha ao criar o lead', e);
+        this.handleError('Falha ao adicionar o acompanhamento', e);
 
-        this.creatingLead = false;
+        this.addingFollowUp = false;
 
         return;
       }
 
-      this.fetch();
-      this.fetchLead(this.lead.id);
+      await this.fetch();
+      await this.fetchLead(this.lead.id);
 
       this.addingFollowUp = false;
       this.showAddFollowUpModal = false;
@@ -666,7 +673,7 @@ export default {
         return;
       }
 
-      this.fetch();
+      await this.fetch();
 
       this.creatingLead = false;
       this.showCreateLead = false;
@@ -707,7 +714,6 @@ export default {
         this.createLeadModel.formData.phone = null;
         this.createLeadModel.formData.coursesOfInterest = [];
         this.createLeadModel.formData.observations = null;
-        this.lead = null;
       }
     },
     followUpModalClosed(shown) {
