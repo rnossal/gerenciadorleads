@@ -619,6 +619,7 @@ export default {
         this.createLeadModel.formData.phone = null;
         this.createLeadModel.formData.coursesOfInterest = [];
         this.createLeadModel.formData.observations = null;
+        this.lead = null;
       }
     },
     exportTable() {
