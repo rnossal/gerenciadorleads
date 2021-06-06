@@ -28,6 +28,7 @@ export const leads = {
     return {
       get: join(this.location, '/'),
       post: join(this.location, '/'),
+      followUp: join(this.location, '/followup'),
       update: join(this.location, '/'),
       delete: join(this.location, '/'),
     };

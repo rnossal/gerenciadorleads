@@ -131,7 +131,7 @@
       title="Criar lead"
       :closable="!creatingLead"
       :mask-closable="!creatingLead"
-      @on-visible-change="modalClosed"
+      @on-visible-change="createLeadModalClosed"
     >
       <div>
         <i-form
@@ -177,7 +177,7 @@
     </Modal>
     <Modal
       v-model="showFollowUpModal"
-      @on-visible-change="modalClosed"
+      @on-visible-change="followUpModalClosed"
       class-name="followup-modal"
       title="Acompanhamentos"
       width="700"
@@ -198,6 +198,49 @@
             <p class="content">{{history.description}}</p>
           </TimelineItem>
         </Timeline>
+      </div>
+      <div slot="footer">
+        <Button
+          type="primary"
+          @click="showAddFollowUpModal = true"
+        >Registrar acompanhamento</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="showAddFollowUpModal"
+      title="Registrar acompanhamento"
+      :closable="!addingFollowUp"
+      :mask-closable="!addingFollowUp"
+      @on-visible-change="addFollowUpModalClosed"
+    >
+      <div>
+        <i-form
+          ref="add-follow-up-form"
+          :model="addFollowUpModel.formData"
+          :rules="addFollowUpModel.formRules"
+          :disabled="addingFollowUp"
+        >
+          <FormItem prop="status" label="Status">
+            <Select v-model="addFollowUpModel.formData.status">
+              <Option
+                v-for="(status, key) in statuses"
+                :value="key"
+                :key="key"
+              >{{ status.text }}</Option>
+            </Select>
+          </FormItem>
+          <FormItem prop="description" label="Descrição">
+            <Input type="textarea" v-model="addFollowUpModel.formData.description" />
+          </FormItem>
+        </i-form>
+      </div>
+      <div slot="footer">
+        <Button @click="showAddFollowUpModal = false" :disabled="addingFollowUp">Cancelar</Button>
+        <Button
+          type="primary"
+          :loading="addingFollowUp"
+          @click="addFollowUp()"
+        >Registrar</Button>
       </div>
     </Modal>
   </div>
@@ -241,6 +284,8 @@ export default {
     showCreateLead: false,
     creatingLead: false,
     showFollowUpModal: false,
+    showAddFollowUpModal: false,
+    addingFollowUp: false,
     leadsColumns: [
       {
         type: 'expand',
@@ -358,6 +403,21 @@ export default {
           {
             required: true,
             message: 'Informe o número de telefone',
+            trigger: 'blur',
+          },
+        ],
+      },
+    },
+    addFollowUpModel: {
+      formData: {
+        status: null,
+        description: null,
+      },
+      formRules: {
+        description: [
+          {
+            required: true,
+            message: 'Informe a descrição',
             trigger: 'blur',
           },
         ],
@@ -540,6 +600,34 @@ export default {
       this.creatingLead = false;
       this.showCreateLead = false;
     },
+    async addFollowUp() {
+      if (!await this.$refs['add-follow-up-form'].validate()) return;
+
+      this.addingFollowUp = true;
+
+      try {
+        await this.$http.post(
+          leads.methods.followUp,
+          {
+            leadId: this.lead.id,
+            description: this.addFollowUpModel.formData.description,
+            status: this.addFollowUpModel.formData.status,
+          },
+        );
+      } catch (e) {
+        this.handleError('Falha ao criar o lead', e);
+
+        this.creatingLead = false;
+
+        return;
+      }
+
+      this.fetch();
+      this.fetchLead(this.lead.id);
+
+      this.addingFollowUp = false;
+      this.showAddFollowUpModal = false;
+    },
     mountUpdateLead(lead) {
       this.createLeadModel.formData.leadId = lead.id;
       this.createLeadModel.formData.name = lead.name;
@@ -611,7 +699,7 @@ export default {
         okText: 'Excluir',
       });
     },
-    modalClosed(shown) {
+    createLeadModalClosed(shown) {
       if (!shown) {
         this.createLeadModel.formData.leadId = null;
         this.createLeadModel.formData.name = null;
@@ -619,6 +707,17 @@ export default {
         this.createLeadModel.formData.phone = null;
         this.createLeadModel.formData.coursesOfInterest = [];
         this.createLeadModel.formData.observations = null;
+      }
+    },
+    followUpModalClosed(shown) {
+      if (!shown) {
+        this.lead = null;
+      }
+    },
+    addFollowUpModalClosed(shown) {
+      if (!shown) {
+        this.addFollowUpModel.formData.description = null;
+        this.addFollowUpModel.formData.status = null;
       }
     },
     exportTable() {
