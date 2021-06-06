@@ -178,13 +178,29 @@
     <Modal
       v-model="showFollowUpModal"
       @on-visible-change="followUpModalClosed"
-      class-name="followup-modal"
+      class-name="follow-up-modal"
       title="Acompanhamentos"
       width="700"
+      footer-hide
     >
+      <div class="follow-up-modal-header" slot="header">
+        <div class="follow-up-modal-header-left">
+          <Button
+            type="primary"
+            icon="md-add"
+            @click="showAddFollowUpModal = true"
+          >Registrar</Button>
+        </div>
+        <div class="follow-up-modal-header-center">
+          <div>
+            <p>Acompanhamentos</p>
+          </div>
+        </div>
+        <div class="follow-up-modal-header-right"></div>
+      </div>
       <div class="follow-up">
         <Timeline
-          v-if="lead && lead.followUpHistory"
+          v-if="lead && lead.followUpHistory && lead.followUpHistory.length > 0"
         >
           <TimelineItem
             v-for="history in lead.followUpHistory"
@@ -198,12 +214,7 @@
             <p class="content">{{history.description}}</p>
           </TimelineItem>
         </Timeline>
-      </div>
-      <div slot="footer">
-        <Button
-          type="primary"
-          @click="showAddFollowUpModal = true"
-        >Registrar acompanhamento</Button>
+        <h2 id="no-leads" v-else>Nenhum acompanhamento registrado.</h2>
       </div>
     </Modal>
     <Modal
@@ -822,7 +833,7 @@ export default {
   padding-left: 5px;
 }
 
-.followup-modal{
+.follow-up-modal{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -835,6 +846,46 @@ export default {
       max-height: 80vh;
       overflow-x: scroll;
     }
+  }
+}
+
+.follow-up-modal-header {
+  display: flex;
+
+  * {
+    user-select: none;
+  }
+}
+
+.follow-up-modal-header-left,
+.follow-up-modal-header-center,
+.follow-up-modal-header-right {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 100%;
+}
+
+.follow-up-modal-header-center {
+  text-align: center;
+  div {
+    width: 100%;
+    height: 35px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .follow-up-modal-header {
+    flex-direction: column-reverse;
+  }
+
+  .follow-up-modal-header-left,
+  .follow-up-modal-header-center,
+  .follow-up-modal-header-right {
+    justify-content: center;
   }
 }
 </style>
