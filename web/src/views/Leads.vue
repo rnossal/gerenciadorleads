@@ -844,7 +844,8 @@ export default {
 
     .ivu-modal-body {
       max-height: 80vh;
-      overflow-x: scroll;
+      overflow-y: auto;
+      word-break: break-all;
     }
   }
 }
