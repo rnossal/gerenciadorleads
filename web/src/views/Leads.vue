@@ -209,7 +209,7 @@
           >
             <p class="time">
               <!-- eslint-disable-next-line max-len -->
-              ({{statuses[history.status].text}}) {{moment(history.createdAt).format('DD/MM/YYYY HH:mm:ss')}} - {{history.createdBy.name}}
+              ({{statuses[history.status].text}}) {{moment(history.createdAt).format('DD/MM/YYYY HH:mm:ss')}} - {{(history.createdBy && history.createdBy.name) ? history.createdBy.name : 'Usuário removido'}}
             </p>
             <p class="content">{{history.description}}</p>
           </TimelineItem>
@@ -746,7 +746,7 @@ export default {
         phone: l.phone,
         coursesOfInterest: this.arrayObjectAttributeToText(l.coursesOfInterest, 'name'),
         observations: l.observations ?? '',
-        createdBy: l.createdBy.name,
+        createdBy: l.createdBy?.name ?? 'Usuário removido',
       }));
 
       this.$refs.leadsTable.exportCsv({

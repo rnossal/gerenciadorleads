@@ -17,7 +17,13 @@
         <ListItemMeta title="Observações" :description="row.observations" />
       </ListItem>
       <ListItem>
-        <ListItemMeta title="Criado por" :description="row.createdBy.name" />
+        <ListItemMeta
+          title="Criado por"
+          :description="
+          (row.createdBy && row.createdBy.name) ?
+            row.createdBy.name :
+            'Usuário removido'"
+        />
       </ListItem>
     </List>
   </div>
