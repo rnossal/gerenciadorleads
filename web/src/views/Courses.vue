@@ -23,39 +23,37 @@
         v-if="courses && courses.length > 0"
       >
         <Card dis-hover>
-          <div id="table-wrapper">
-            <Table
-              id="courses-table"
-              ref="coursesTable"
-              :columns="coursesColumns"
-              :data="courses"
-              stripe
-              border
-            >
-              <template slot-scope="{ row }" slot="actions">
-                <Row
-                  type="flex"
-                  justify="center"
-                  :gutter="5"
-                >
-                  <i-col>
-                    <Button
-                      type="primary"
-                      @click="mountUpdateCourse(row)"
-                      :style="{ width: '75px' }"
-                    >Editar</Button>
-                  </i-col>
-                  <i-col>
-                    <Button
-                      type="error"
-                      @click="deleteCourse(row)"
-                      :style="{ width: '75px' }"
-                    >Excluir</Button>
-                  </i-col>
-                </Row>
-              </template>
-            </Table>
-          </div>
+          <Table
+            id="courses-table"
+            ref="coursesTable"
+            :columns="coursesColumns"
+            :data="courses"
+            stripe
+            border
+          >
+            <template slot-scope="{ row }" slot="actions">
+              <Row
+                type="flex"
+                justify="center"
+                :gutter="5"
+              >
+                <i-col>
+                  <Button
+                    type="primary"
+                    @click="mountUpdateCourse(row)"
+                    :style="{ width: '75px' }"
+                  >Editar</Button>
+                </i-col>
+                <i-col>
+                  <Button
+                    type="error"
+                    @click="deleteCourse(row)"
+                    :style="{ width: '75px' }"
+                  >Excluir</Button>
+                </i-col>
+              </Row>
+            </template>
+          </Table>
         </Card>
       </div>
       <h1 id="no-courses" v-else>Não existem cursos cadastrados.</h1>
@@ -106,11 +104,13 @@ export default {
         title: 'Nome',
         key: 'name',
         ellipsis: true,
+        minWidth: 250,
       },
       {
         title: 'Ações',
         slot: 'actions',
         align: 'center',
+        width: 195,
       },
     ],
     searchTerm: null,
@@ -303,13 +303,5 @@ export default {
 
 #export-table-btn {
   margin-left: auto;
-}
-
-#table-wrapper {
-  overflow-x: scroll;
-}
-
-#courses-table {
-  min-width: 350px;
 }
 </style>
