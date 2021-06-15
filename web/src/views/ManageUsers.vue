@@ -44,7 +44,10 @@
                 <Input prefix="ios-mail" v-model="formData.email" />
               </FormItem>
               <FormItem prop="admin" label="Administrador">
-                <i-switch v-model="formData.admin" />
+                <i-switch
+                  v-model="formData.admin"
+                  :disabled="userInfo.id === $store.state.user.id"
+                />
               </FormItem>
               <FormItem prop="username" label="Usuário">
                 <Input prefix="ios-contact" v-model="formData.username" />
@@ -61,7 +64,7 @@
                   type="error"
                   :loading="saving"
                   @click="creatingUser ? cancelCreateUser() : deleteUser()"
-                  :disabled="disabled"
+                  :disabled="disabled || userInfo.id === $store.state.user.id"
                   long
                 >{{creatingUser ? 'Calcelar' : 'Deletar'}}</Button>
                 <Button
