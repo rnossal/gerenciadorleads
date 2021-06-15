@@ -3,82 +3,112 @@
     <Content :style="{padding: '20px 50px'}">
       <h1>Gerenciar usuários</h1>
       <Card :dis-hover="true">
-        <Layout>
-          <Sider id="users-sider" width="300">
-            <Input
-              search
-              enter-button
-              placeholder="Pesquisar por nome/email/usuário"
-              v-model="searchTerm"
-              @on-search="onSearch"
-            />
-            <Divider id="users-list-divider" />
-            <Button @click="mountCreateUser" type="primary" long>Criar usuário</Button>
-            <Divider id="users-list-divider" />
-            <List>
-              <ListItem
-                class="user-list-item"
-                v-for="userItem in usersList"
-                :key="userItem.id"
-                @click.native="loadUser(userItem.id)"
+        <div id="manage-users-card">
+          <Layout id="manage-users-layout">
+            <Sider id="users-sider" width="300">
+              <Input
+                search
+                enter-button
+                placeholder="Pesquisar por nome/email/usuário"
+                v-model="searchTerm"
+                @on-search="onSearch"
+              />
+              <Divider id="users-list-divider" />
+              <Button @click="mountCreateUser" type="primary" long>Criar usuário</Button>
+              <Divider id="users-list-divider" />
+              <List>
+                <ListItem
+                  :class="`user-list-item ${userItem.selected ? 'user-list-item-selected' : ''}`"
+                  v-for="userItem in usersList"
+                  :key="userItem.id"
+                  @click.native="loadUser(userItem)"
+                >
+                  <div>
+                    <p><b>Nome</b>: {{userItem.name}}</p>
+                    <p><b>Usuário</b>: {{userItem.username}}</p>
+                    <p><b>Email</b>: {{userItem.email}}</p>
+                  </div>
+                </ListItem>
+              </List>
+            </Sider>
+            <Content id="user-content">
+              <i-form
+                ref="user-form"
+                :model="formData"
+                :rules="formRules"
+                :disabled="saving || disabled"
               >
-                <div>
-                  <p><b>Nome</b>: {{userItem.name}}</p>
-                  <p><b>Usuário</b>: {{userItem.username}}</p>
-                  <p><b>Email</b>: {{userItem.email}}</p>
-                </div>
-              </ListItem>
-            </List>
-          </Sider>
-          <Content id="user-content">
-            <i-form
-              ref="user-form"
-              :model="formData"
-              :rules="formRules"
-              :disabled="saving || disabled"
-            >
-              <FormItem prop="name" label="Nome">
-                <Input prefix="ios-person" v-model="formData.name" />
-              </FormItem>
-              <FormItem prop="email" label="E-mail">
-                <Input prefix="ios-mail" v-model="formData.email" />
-              </FormItem>
-              <FormItem prop="admin" label="Administrador">
-                <i-switch
-                  v-model="formData.admin"
-                  :disabled="userInfo.id === $store.state.user.id"
-                />
-              </FormItem>
-              <FormItem prop="username" label="Usuário">
-                <Input prefix="ios-contact" v-model="formData.username" />
-              </FormItem>
-              <FormItem prop="user" label="Usuário" class="fake-user">
-                <Input prefix="ios-contact" value="f3d224f82a774382b95f4a168e20ff52" />
-              </FormItem>
-              <FormItem prop="password" label="Senha (informar somente se quiser alterar)">
-                <Input type="password" prefix="ios-key" v-model="formData.password" password />
-              </FormItem>
-              <FormItem>
-                <Button
-                  class="user-actions"
-                  type="error"
-                  :loading="saving"
-                  @click="creatingUser ? cancelCreateUser() : deleteUser()"
-                  :disabled="disabled || userInfo.id === $store.state.user.id"
-                  long
-                >{{creatingUser ? 'Calcelar' : 'Deletar'}}</Button>
-                <Button
-                  class="user-actions"
-                  type="primary"
-                  :loading="saving"
-                  @click="creatingUser ? createUser() : saveUser()"
-                  :disabled="disabled"
-                  long
-                >{{creatingUser ? 'Criar usuário' : 'Salvar'}}</Button>
-              </FormItem>
-            </i-form>
-          </Content>
-        </Layout>
+                <FormItem prop="name" label="Nome">
+                  <Input prefix="ios-person" v-model="formData.name" />
+                </FormItem>
+                <FormItem prop="email" label="E-mail">
+                  <Input prefix="ios-mail" v-model="formData.email" />
+                </FormItem>
+                <FormItem prop="admin" label="Administrador">
+                  <Tooltip
+                    v-if="userInfo.id === $store.state.user.id"
+                    content="Não é possível mudar as permissões do próprio usuário"
+                    placement="top"
+                    max-width="250"
+                  >
+                    <i-switch
+                      v-model="formData.admin"
+                      :disabled="userInfo.id === $store.state.user.id"
+                    />
+                  </Tooltip>
+                  <i-switch
+                    v-else
+                    v-model="formData.admin"
+                    :disabled="userInfo.id === $store.state.user.id"
+                  />
+                </FormItem>
+                <FormItem prop="username" label="Usuário">
+                  <Input prefix="ios-contact" v-model="formData.username" />
+                </FormItem>
+                <FormItem prop="user" label="Usuário" class="fake-user">
+                  <Input prefix="ios-contact" value="f3d224f82a774382b95f4a168e20ff52" />
+                </FormItem>
+                <FormItem prop="password" label="Senha (informar somente se quiser alterar)">
+                  <Input type="password" prefix="ios-key" v-model="formData.password" password />
+                </FormItem>
+                <FormItem>
+                  <Tooltip
+                    class="user-actions"
+                    v-if="userInfo.id === $store.state.user.id"
+                    content="Não é possível deletar o próprio usuário"
+                    placement="top"
+                    max-width="200"
+                  >
+                    <Button
+                      type="error"
+                      :loading="saving"
+                      @click="creatingUser ? cancelCreateUser() : deleteUser()"
+                      :disabled="disabled || userInfo.id === $store.state.user.id"
+                      long
+                    >{{creatingUser ? 'Calcelar' : 'Deletar'}}</Button>
+                  </Tooltip>
+                  <Button
+                    v-else
+                    class="user-actions"
+                    type="error"
+                    :loading="saving"
+                    @click="creatingUser ? cancelCreateUser() : deleteUser()"
+                    :disabled="disabled || userInfo.id === $store.state.user.id"
+                    long
+                  >{{creatingUser ? 'Calcelar' : 'Deletar'}}</Button>
+                  <Button
+                    class="user-actions"
+                    type="primary"
+                    :loading="saving"
+                    @click="creatingUser ? createUser() : saveUser()"
+                    :disabled="disabled"
+                    long
+                  >{{creatingUser ? 'Criar usuário' : 'Salvar'}}</Button>
+                </FormItem>
+              </i-form>
+            </Content>
+          </Layout>
+        </div>
       </Card>
     </Content>
   </div>
@@ -208,7 +238,13 @@ export default {
       this.creatingUser = false;
       this.formData = {};
     },
-    async loadUser(userId) {
+    async loadUser(user) {
+      this.usersList.forEach((item) => {
+        // eslint-disable-next-line no-param-reassign
+        item.selected = false;
+      });
+      // eslint-disable-next-line no-param-reassign
+      user.selected = true;
       this.disabled = true;
       this.creatingUser = false;
       this.formData = {
@@ -224,7 +260,7 @@ export default {
         const response = await this.$http.get(users.methods.get, {
           params: {
             query: `{
-              user(id: "${userId}") {
+              user(id: "${user.id}") {
                 id
                 name
                 username
@@ -384,6 +420,9 @@ export default {
 
 .user-actions {
   width: calc(50% - 5px);
+  .ivu-tooltip-rel {
+    width: 100%;
+  }
 }
 
 #users-sider,
@@ -400,6 +439,7 @@ export default {
 }
 
 #user-content {
+  overflow: unset;
   border: 1px solid #e8eaec;
   border-radius: 0px 3px 3px 0px;
 }
@@ -410,11 +450,29 @@ export default {
 
 .user-list-item:hover {
   background: #f7f7f7;
+  cursor: pointer;
+}
+
+.user-list-item-selected {
+  background: #f7f7f7;
 }
 
 .fake-user {
   margin-bottom: 0;
   height: 0;
   overflow: hidden;
+}
+
+#manage-users-card {
+  overflow-x: auto;
+}
+
+#manage-users-layout {
+  min-width: 600px;
+}
+
+.ivu-tooltip-inner {
+  word-break: unset !important;
+  text-align: center !important;
 }
 </style>
