@@ -455,7 +455,7 @@ export default {
                 email: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}",
                 phone: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}",
                 observations: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}"
-                coursesOfInterest: []
+                coursesOfInterest: ${Array.isArray(this.searchLeadModel.formData.coursesOfInterest) ? JSON.stringify(this.searchLeadModel.formData.coursesOfInterest) : '[]'}
               ) {
                 id
                 name
