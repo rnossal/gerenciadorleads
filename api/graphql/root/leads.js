@@ -27,7 +27,7 @@ export const LeadsRoot = {
     const { models } = req.context;
 
     const query = {};
-    if (args.name || args.email || args.phone || args.observations || (Array.isArray(args.coursesOfInterest) && args.coursesOfInterest.length > 0)) {
+    if (args.name || args.email || args.phone || args.observations || (Array.isArray(args.coursesOfInterest) && args.coursesOfInterest.length > 0) || (Array.isArray(args.statuses) && args.statuses.length > 0)) {
       query.$or = [];
 
       if (args.name) {
@@ -44,6 +44,9 @@ export const LeadsRoot = {
       }
       if (Array.isArray(args.coursesOfInterest) && args.coursesOfInterest.length > 0) {
         query.$or.push({ coursesOfInterest: { $in: args.coursesOfInterest } });
+      }
+      if (Array.isArray(args.statuses) && args.statuses.length > 0) {
+        query.$or.push({ status: { $in: args.statuses } });
       }
     }
 

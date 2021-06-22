@@ -45,6 +45,15 @@
                       >{{ course.name }}</Option>
                     </Select>
                   </FormItem>
+                  <FormItem prop="statuses" label="Status">
+                    <Select v-model="searchLeadModel.formData.statuses" multiple>
+                      <Option
+                        v-for="(status, index) in statuses"
+                        :value="index"
+                        :key="index"
+                      >{{ status.text }}</Option>
+                    </Select>
+                  </FormItem>
                   <FormItem>
                     <Button id="clear-filters" @click="clearSearch">Limpar filtros</Button>
                     <Button @click="fetch" type="primary">Pesquisar</Button>
@@ -379,6 +388,7 @@ export default {
       formData: {
         searchTerm: null,
         coursesOfInterest: [],
+        statuses: [],
       },
     },
     createLeadModel: {
@@ -456,6 +466,7 @@ export default {
                 phone: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}",
                 observations: "${this.searchLeadModel.formData.searchTerm ? this.searchLeadModel.formData.searchTerm : ''}"
                 coursesOfInterest: ${Array.isArray(this.searchLeadModel.formData.coursesOfInterest) ? JSON.stringify(this.searchLeadModel.formData.coursesOfInterest) : '[]'}
+                statuses: ${Array.isArray(this.searchLeadModel.formData.statuses) ? JSON.stringify(this.searchLeadModel.formData.statuses) : '[]'}
               ) {
                 id
                 name
@@ -554,6 +565,7 @@ export default {
     clearSearch() {
       this.searchLeadModel.formData.searchTerm = null;
       this.searchLeadModel.formData.coursesOfInterest = [];
+      this.searchLeadModel.formData.statuses = [];
 
       this.fetch();
     },

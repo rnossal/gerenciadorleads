@@ -38,6 +38,9 @@ export const LeadsSchema = new GraphQLSchema({
           coursesOfInterest: {
             type: GraphQLList(GraphQLString),
           },
+          statuses: {
+            type: GraphQLList(GraphQLString),
+          },
         },
       },
     },
