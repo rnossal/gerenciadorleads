@@ -297,6 +297,10 @@ export default {
         color: '#fadb14',
         text: 'A contatar',
       },
+      4: {
+        color: '#2db7f5',
+        text: 'Matriculado',
+      },
     },
     leads: [],
     lead: null,

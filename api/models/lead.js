@@ -16,7 +16,7 @@ export const schema = new mongoose.Schema({
   status: {
     type: Number,
     min: 0,
-    max: 3,
+    max: 4,
     default: 0,
     validate: {
       validator: Number.isInteger,
