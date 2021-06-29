@@ -279,183 +279,210 @@ export default {
   components: {
     CInput,
   },
-  data: () => ({
-    statuses: {
-      0: {
-        color: 'gray',
-        text: 'Nenhum',
+  data() {
+    const emailOrPhoneValidator = (rule, value, callback) => {
+      if (!this.createLeadModel.formData.email && !this.createLeadModel.formData.phone) {
+        return callback(new Error('Você deve informar um e-mail ou telefone válido.'));
+      }
+
+      return callback();
+    };
+
+    return {
+      statuses: {
+        0: {
+          color: 'gray',
+          text: 'Nenhum',
+        },
+        1: {
+          color: '#52c41a',
+          text: 'Interessado',
+        },
+        2: {
+          color: '#f5222d',
+          text: 'Sem interesse',
+        },
+        3: {
+          color: '#fadb14',
+          text: 'A contatar',
+        },
+        4: {
+          color: '#2db7f5',
+          text: 'Matriculado',
+        },
       },
-      1: {
-        color: '#52c41a',
-        text: 'Interessado',
+      leads: [],
+      lead: null,
+      courses: [],
+      showCreateLead: false,
+      creatingLead: false,
+      showFollowUpModal: false,
+      showAddFollowUpModal: false,
+      addingFollowUp: false,
+      leadsColumns: [
+        {
+          type: 'expand',
+          width: 40,
+          render: (h, params) => h(LeadTableInfo, {
+            props: {
+              row: params.row,
+            },
+          }),
+        },
+        {
+          title: 'Status',
+          slot: 'status',
+          ellipsis: true,
+          minWidth: 150,
+          maxWidth: 150,
+        },
+        {
+          title: 'Nome',
+          key: 'name',
+          ellipsis: true,
+          minWidth: 150,
+        },
+        {
+          title: 'E-mail',
+          key: 'email',
+          ellipsis: true,
+          minWidth: 150,
+        },
+        {
+          title: 'Telefone',
+          key: 'phone',
+          ellipsis: true,
+          minWidth: 150,
+        },
+        {
+          title: 'Observações',
+          key: 'observations',
+          ellipsis: true,
+          minWidth: 150,
+        },
+        {
+          title: 'Ações',
+          slot: 'actions',
+          align: 'center',
+          width: 195,
+        },
+      ],
+      leadsExportColumns: [
+        {
+          title: 'Status',
+          key: 'status',
+        },
+        {
+          title: 'Nome',
+          key: 'name',
+        },
+        {
+          title: 'E-mail',
+          key: 'email',
+        },
+        {
+          title: 'Telefone',
+          key: 'phone',
+        },
+        {
+          title: 'Cursos de interesse',
+          key: 'coursesOfInterest',
+        },
+        {
+          title: 'Observações',
+          key: 'observations',
+        },
+        {
+          title: 'Criado por',
+          key: 'createdBy',
+        },
+      ],
+      searchLeadModel: {
+        formData: {
+          searchTerm: null,
+          coursesOfInterest: [],
+          statuses: [],
+        },
       },
-      2: {
-        color: '#f5222d',
-        text: 'Sem interesse',
+      createLeadModel: {
+        formData: {
+          leadId: null,
+          name: null,
+          email: null,
+          phone: null,
+          coursesOfInterest: [],
+          observations: null,
+        },
+        formRules: {
+          name: [
+            {
+              required: true,
+              message: 'Informe o nome',
+              trigger: 'blur',
+            },
+          ],
+          email: [
+            {
+              validator: emailOrPhoneValidator,
+              trigger: 'blur',
+            },
+            {
+              type: 'email',
+              message: 'Email em formato incorreto',
+              trigger: 'blur',
+            },
+          ],
+          phone: [
+            {
+              validator: emailOrPhoneValidator,
+              trigger: 'blur',
+            },
+          ],
+          // email: [
+          //   {
+          //     required: true,
+          //     message: 'Informe o email',
+          //     trigger: 'blur',
+          //   },
+          //   {
+          //     type: 'email',
+          //     message: 'Email em formato incorreto',
+          //     trigger: 'blur',
+          //   },
+          // ],
+          // phone: [
+          //   {
+          //     required: true,
+          //     message: 'Informe o número de telefone',
+          //     trigger: 'blur',
+          //   },
+          // ],
+        },
       },
-      3: {
-        color: '#fadb14',
-        text: 'A contatar',
+      addFollowUpModel: {
+        formData: {
+          status: null,
+          description: null,
+        },
+        formRules: {
+          status: [
+            {
+              required: true,
+              message: 'Informe um status',
+              trigger: 'blur',
+            },
+          ],
+          description: [
+            {
+              required: true,
+              message: 'Informe a descrição',
+              trigger: 'blur',
+            },
+          ],
+        },
       },
-      4: {
-        color: '#2db7f5',
-        text: 'Matriculado',
-      },
-    },
-    leads: [],
-    lead: null,
-    courses: [],
-    showCreateLead: false,
-    creatingLead: false,
-    showFollowUpModal: false,
-    showAddFollowUpModal: false,
-    addingFollowUp: false,
-    leadsColumns: [
-      {
-        type: 'expand',
-        width: 40,
-        render: (h, params) => h(LeadTableInfo, {
-          props: {
-            row: params.row,
-          },
-        }),
-      },
-      {
-        title: 'Status',
-        slot: 'status',
-        ellipsis: true,
-        minWidth: 150,
-        maxWidth: 150,
-      },
-      {
-        title: 'Nome',
-        key: 'name',
-        ellipsis: true,
-        minWidth: 150,
-      },
-      {
-        title: 'E-mail',
-        key: 'email',
-        ellipsis: true,
-        minWidth: 150,
-      },
-      {
-        title: 'Telefone',
-        key: 'phone',
-        ellipsis: true,
-        minWidth: 150,
-      },
-      {
-        title: 'Observações',
-        key: 'observations',
-        ellipsis: true,
-        minWidth: 150,
-      },
-      {
-        title: 'Ações',
-        slot: 'actions',
-        align: 'center',
-        width: 195,
-      },
-    ],
-    leadsExportColumns: [
-      {
-        title: 'Status',
-        key: 'status',
-      },
-      {
-        title: 'Nome',
-        key: 'name',
-      },
-      {
-        title: 'E-mail',
-        key: 'email',
-      },
-      {
-        title: 'Telefone',
-        key: 'phone',
-      },
-      {
-        title: 'Cursos de interesse',
-        key: 'coursesOfInterest',
-      },
-      {
-        title: 'Observações',
-        key: 'observations',
-      },
-      {
-        title: 'Criado por',
-        key: 'createdBy',
-      },
-    ],
-    searchLeadModel: {
-      formData: {
-        searchTerm: null,
-        coursesOfInterest: [],
-        statuses: [],
-      },
-    },
-    createLeadModel: {
-      formData: {
-        leadId: null,
-        name: null,
-        email: null,
-        phone: null,
-        coursesOfInterest: [],
-        observations: null,
-      },
-      formRules: {
-        name: [
-          {
-            required: true,
-            message: 'Informe o nome',
-            trigger: 'blur',
-          },
-        ],
-        email: [
-          {
-            required: true,
-            message: 'Informe o email',
-            trigger: 'blur',
-          },
-          {
-            type: 'email',
-            message: 'Email em formato incorreto',
-            trigger: 'blur',
-          },
-        ],
-        phone: [
-          {
-            required: true,
-            message: 'Informe o número de telefone',
-            trigger: 'blur',
-          },
-        ],
-      },
-    },
-    addFollowUpModel: {
-      formData: {
-        status: null,
-        description: null,
-      },
-      formRules: {
-        status: [
-          {
-            required: true,
-            message: 'Informe um status',
-            trigger: 'blur',
-          },
-        ],
-        description: [
-          {
-            required: true,
-            message: 'Informe a descrição',
-            trigger: 'blur',
-          },
-        ],
-      },
-    },
-  }),
+    };
+  },
   methods: {
     async fetch() {
       let graphqlResponse = null;
