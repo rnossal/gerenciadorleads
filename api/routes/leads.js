@@ -26,8 +26,9 @@ router.post('/', authenticate(), async (req, res) => {
   } = req.body;
 
   if (!name || name.trim() === 0) return res.status(400).json({ message: req.t('INVALID_NAME') });
-  if (!email || !validator.isEmail(email)) return res.status(400).json({ message: req.t('INVALID_EMAIL') });
-  if (!phone || phone.trim() === 0) return res.status(400).json({ message: req.t('INVALID_PHONE') });
+  // if (!email || !validator.isEmail(email)) return res.status(400).json({ message: req.t('INVALID_EMAIL') });
+  // if (!phone || phone.trim() === 0) return res.status(400).json({ message: req.t('INVALID_PHONE') });
+  if ((!phone || phone.trim() === 0) && (!email || !validator.isEmail(email))) return res.status(400).json({ message: req.t('INVALID_EMAIL_PHONE') });
 
   const leadModel = models.Lead({
     name,
